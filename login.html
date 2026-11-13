@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login | Accounting System</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+    background: #f1f5f9;
+    color: #172554;
+}
+
+.login-container {
+    width: 100%;
+    max-width: 410px;
+    background: white;
+    padding: 38px 32px;
+    border-radius: 14px;
+    box-shadow: 0 8px 35px rgba(0,0,0,0.08);
+}
+
+.logo {
+    width: 55px;
+    height: 55px;
+    margin: 0 auto 18px;
+    border-radius: 12px;
+    background: #172554;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 25px;
+    font-weight: bold;
+}
+
+h2 {
+    text-align: center;
+    margin: 0;
+}
+
+.subtitle {
+    text-align: center;
+    color: #64748b;
+    font-size: 13px;
+    margin: 9px 0 30px;
+}
+
+label {
+    display: block;
+    font-size: 13px;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.input-group {
+    margin-bottom: 20px;
+}
+
+input[type="text"],
+input[type="password"] {
+    width: 100%;
+    padding: 13px;
+    border: 1px solid #cbd5e1;
+    border-radius: 7px;
+    outline: none;
+    font-size: 14px;
+}
+
+input:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37,99,235,.10);
+}
+
+.password-wrapper {
+    position: relative;
+}
+
+.password-wrapper input {
+    padding-right: 75px;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    border: none;
+    background: none;
+    color: #2563eb;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.remember {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 4px 0 22px;
+    font-size: 13px;
+    color: #475569;
+}
+
+button.login-btn {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 7px;
+    background: #172554;
+    color: white;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.login-btn:hover {
+    background: #1e40af;
+}
+
+.error {
+    display: none;
+    color: #dc2626;
+    font-size: 13px;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.footer {
+    margin-top: 28px;
+    text-align: center;
+    font-size: 11px;
+    color: #94a3b8;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="login-container">
+
+    <div class="logo">A</div>
+
+    <h2>Welcome Back</h2>
+    <p class="subtitle">Accounting Management System</p>
+
+    <form id="loginForm">
+
+        <div class="input-group">
+            <label for="username">Username</label>
+            <input
+                type="text"
+                id="username"
+                placeholder="Enter your username"
+                autocomplete="username"
+                required
+            >
+        </div>
+
+        <div class="input-group">
+            <label for="password">Password</label>
+
+            <div class="password-wrapper">
+                <input
+                    type="password"
+                    id="password"
+                    placeholder="Enter your password"
+                    autocomplete="current-password"
+                    required
+                >
+
+                <button
+                    type="button"
+                    class="toggle-password"
+                    id="togglePassword"
+                >
+                    Show
+                </button>
+            </div>
+        </div>
+
+        <label class="remember">
+            <input type="checkbox" id="remember">
+            Remember username
+        </label>
+
+        <div class="error" id="errorMessage"></div>
+
+        <button type="submit" class="login-btn">
+            Sign In
+        </button>
+
+    </form>
+
+    <div class="footer">
+        Accounting Management System
+    </div>
+
+</div>
+
+<script>
+
+// Remember username
+const username = document.getElementById("username");
+const remember = document.getElementById("remember");
+
+username.value = localStorage.getItem("acc_username") || "";
+remember.checked = !!username.value;
+
+// Show / Hide password
+document.getElementById("togglePassword")
+.addEventListener("click", function() {
+
+    const password = document.getElementById("password");
+
+    if (password.type === "password") {
+        password.type = "text";
+        this.textContent = "Hide";
+    } else {
+        password.type = "password";
+        this.textContent = "Show";
+    }
+
+});
+
+// Temporary form handler
+document.getElementById("loginForm")
+.addEventListener("submit", function(event) {
+
+    event.preventDefault();
+
+    const error = document.getElementById("errorMessage");
+
+    if (remember.checked) {
+        localStorage.setItem("acc_username", username.value.trim());
+    } else {
+        localStorage.removeItem("acc_username");
+    }
+
+    error.style.display = "block";
+    error.textContent = "Login authentication is not connected yet.";
+
+});
+
+</script>
+
+</body>
+</html>
