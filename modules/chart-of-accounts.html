@@ -4,60 +4,357 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Stock Movement | ACC System</title>
+<title>Chart of Accounts | ACC System</title>
 
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 
 <style>
-*{box-sizing:border-box}
-body{margin:0;padding:28px;font-family:Arial,Helvetica,sans-serif;background:#f4f6fa;color:#26364e}
-.heading{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:22px;flex-wrap:wrap}
-.heading h2{margin:0 0 7px;font-size:23px}
-.heading p{margin:0;color:#8993a5;font-size:13px}
-button{cursor:pointer;font-family:inherit}
-.primary-btn{border:0;border-radius:6px;background:#315efb;color:white;padding:11px 18px;font-size:12px;font-weight:bold}
-.primary-btn:hover{background:#244bd2}
-.primary-btn:disabled{opacity:.5;cursor:not-allowed}
-.panel{background:white;border:1px solid #e8ecf2;border-radius:10px;padding:22px;margin-bottom:20px}
-.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:20px}
-.stat{background:white;border:1px solid #e8ecf2;border-radius:9px;padding:17px}
-.stat-label{font-size:11px;color:#8993a5}
-.stat-value{font-size:23px;font-weight:bold;margin-top:9px}
-.toolbar{display:grid;grid-template-columns:minmax(180px,1fr) 220px 150px;gap:10px;margin-bottom:18px}
-input,select,textarea{width:100%;min-height:40px;border:1px solid #dce2eb;border-radius:6px;padding:9px 11px;font-family:inherit;font-size:12px;outline:none;background:white;color:#26364e}
-input:focus,select:focus,textarea:focus{border-color:#315efb;box-shadow:0 0 0 3px rgba(49,94,251,.08)}
-.table-wrapper{width:100%;overflow-x:auto}
-table{width:100%;min-width:1050px;border-collapse:collapse}
-thead{background:#f3f5f9}
-th{padding:13px 12px;text-align:left;color:#65748b;font-size:11px;white-space:nowrap}
-td{padding:13px 12px;border-bottom:1px solid #edf0f5;font-size:12px;white-space:nowrap}
-tr:hover td{background:#fafbfe}
-.qty-in{color:#16834b;font-weight:bold}
-.qty-out{color:#c03939;font-weight:bold}
-.type-badge{display:inline-block;padding:5px 8px;border-radius:5px;background:#edf2ff;color:#315efb;font-size:10px;font-weight:bold}
-.table-action{border:0;background:transparent;color:#315efb;font-size:11px;font-weight:bold;margin-right:9px}
-.table-action.danger{color:#d04444}
-.empty{text-align:center;padding:35px;color:#8993a5}
-.message{display:none;padding:12px 14px;border-radius:6px;font-size:12px;margin-bottom:18px}
-.message.success{display:block;background:#e8f8ef;color:#16834b}
-.message.error{display:block;background:#fff0f0;color:#c03939}
-.modal{display:none;position:fixed;inset:0;background:rgba(12,24,44,.55);z-index:1000;align-items:center;justify-content:center;padding:18px}
-.modal.show{display:flex}
-.modal-content{width:100%;max-width:700px;max-height:90vh;overflow-y:auto;background:white;border-radius:10px;padding:25px;box-shadow:0 15px 50px rgba(0,0,0,.15)}
-.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px}
-.modal-header h3{margin:0;font-size:17px}
-.close-btn{border:0;background:transparent;font-size:24px;color:#8993a5}
-.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:17px}
-.field{display:flex;flex-direction:column;gap:7px}
-.field.full{grid-column:1/-1}
-.field label{font-size:11px;font-weight:bold;color:#536176}
-.field small{font-size:11px;color:#8993a5}
-textarea{min-height:75px;resize:vertical}
-.modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:23px;padding-top:18px;border-top:1px solid #edf0f5}
-.secondary-btn{border:1px solid #dce2eb;background:#f8f9fc;color:#536176;padding:10px 17px;border-radius:6px;font-size:12px}
-.readonly{background:#f3f5f9;color:#65748b}
-@media(max-width:850px){.stats{grid-template-columns:repeat(2,1fr)}.toolbar{grid-template-columns:1fr 1fr}.toolbar input{grid-column:1/-1}}
-@media(max-width:550px){body{padding:16px}.stats{grid-template-columns:1fr 1fr}.toolbar{grid-template-columns:1fr}.toolbar input{grid-column:auto}.form-grid{grid-template-columns:1fr}.field.full{grid-column:auto}.panel{padding:15px}}
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    padding: 28px;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f4f6fa;
+    color: #26364e;
+}
+
+.heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 22px;
+    flex-wrap: wrap;
+}
+
+.heading h2 {
+    margin: 0 0 7px;
+    font-size: 23px;
+}
+
+.heading p {
+    margin: 0;
+    color: #8993a5;
+    font-size: 13px;
+}
+
+button {
+    cursor: pointer;
+    font-family: inherit;
+}
+
+.primary-btn {
+    border: 0;
+    border-radius: 6px;
+    background: #315efb;
+    color: white;
+    padding: 11px 18px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.primary-btn:hover {
+    background: #244bd2;
+}
+
+.panel {
+    background: white;
+    border: 1px solid #e8ecf2;
+    border-radius: 10px;
+    padding: 22px;
+    margin-bottom: 20px;
+}
+
+.stats {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 14px;
+    margin-bottom: 20px;
+}
+
+.stat {
+    background: white;
+    border: 1px solid #e8ecf2;
+    border-radius: 9px;
+    padding: 17px;
+}
+
+.stat-label {
+    font-size: 11px;
+    color: #8993a5;
+}
+
+.stat-value {
+    font-size: 23px;
+    font-weight: bold;
+    margin-top: 9px;
+}
+
+.toolbar {
+    display: grid;
+    grid-template-columns: minmax(180px, 1fr) 220px 140px;
+    gap: 10px;
+    margin-bottom: 18px;
+}
+
+input, select, textarea {
+    width: 100%;
+    min-height: 40px;
+    border: 1px solid #dce2eb;
+    border-radius: 6px;
+    padding: 9px 11px;
+    font-family: inherit;
+    font-size: 12px;
+    outline: none;
+    background: white;
+    color: #26364e;
+}
+
+input:focus, select:focus, textarea:focus {
+    border-color: #315efb;
+    box-shadow: 0 0 0 3px rgba(49,94,251,.08);
+}
+
+.table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    min-width: 900px;
+    border-collapse: collapse;
+}
+
+thead {
+    background: #f3f5f9;
+}
+
+th {
+    padding: 13px 12px;
+    text-align: left;
+    color: #65748b;
+    font-size: 11px;
+    white-space: nowrap;
+}
+
+td {
+    padding: 13px 12px;
+    border-bottom: 1px solid #edf0f5;
+    font-size: 12px;
+}
+
+tr:hover td {
+    background: #fafbfe;
+}
+
+.account-code {
+    font-weight: bold;
+    color: #315efb;
+}
+
+.type-badge {
+    display: inline-block;
+    padding: 5px 8px;
+    border-radius: 5px;
+    background: #edf2ff;
+    color: #315efb;
+    font-size: 10px;
+    font-weight: bold;
+}
+
+.status-active {
+    color: #16834b;
+    font-weight: bold;
+}
+
+.status-inactive {
+    color: #c03939;
+    font-weight: bold;
+}
+
+.table-action {
+    border: 0;
+    background: transparent;
+    color: #315efb;
+    font-size: 11px;
+    font-weight: bold;
+    margin-right: 9px;
+}
+
+.table-action.danger {
+    color: #d04444;
+}
+
+.empty {
+    text-align: center;
+    padding: 35px;
+    color: #8993a5;
+}
+
+.message {
+    display: none;
+    padding: 12px 14px;
+    border-radius: 6px;
+    font-size: 12px;
+    margin-bottom: 18px;
+}
+
+.message.success {
+    display: block;
+    background: #e8f8ef;
+    color: #16834b;
+}
+
+.message.error {
+    display: block;
+    background: #fff0f0;
+    color: #c03939;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(12, 24, 44, .55);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    padding: 18px;
+}
+
+.modal.show {
+    display: flex;
+}
+
+.modal-content {
+    width: 100%;
+    max-width: 700px;
+    max-height: 90vh;
+    overflow-y: auto;
+    background: white;
+    border-radius: 10px;
+    padding: 25px;
+    box-shadow: 0 15px 50px rgba(0,0,0,.15);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 22px;
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 17px;
+}
+
+.close-btn {
+    border: 0;
+    background: transparent;
+    font-size: 24px;
+    color: #8993a5;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 17px;
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.field.full {
+    grid-column: 1 / -1;
+}
+
+.field label {
+    font-size: 11px;
+    font-weight: bold;
+    color: #536176;
+}
+
+textarea {
+    min-height: 75px;
+    resize: vertical;
+}
+
+.readonly {
+    background: #f3f5f9;
+    color: #65748b;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 23px;
+    padding-top: 18px;
+    border-top: 1px solid #edf0f5;
+}
+
+.secondary-btn {
+    border: 1px solid #dce2eb;
+    background: #f8f9fc;
+    color: #536176;
+    padding: 10px 17px;
+    border-radius: 6px;
+    font-size: 12px;
+}
+
+.loading {
+    text-align: center;
+    color: #8993a5;
+    padding: 25px;
+}
+
+@media(max-width: 850px) {
+    .stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .toolbar {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .toolbar input {
+        grid-column: 1 / -1;
+    }
+}
+
+@media(max-width: 550px) {
+    body { padding: 16px; }
+
+    .stats {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .toolbar {
+        grid-template-columns: 1fr;
+    }
+
+    .toolbar input {
+        grid-column: auto;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .field.full {
+        grid-column: auto;
+    }
+
+    .panel {
+        padding: 15px;
+    }
+}
 </style>
 </head>
 
@@ -65,152 +362,168 @@ textarea{min-height:75px;resize:vertical}
 
 <div class="heading">
     <div>
-        <h2>Stock Movement</h2>
-        <p>Monitor and manage inventory stock movements.</p>
+        <h2>Chart of Accounts</h2>
+        <p>Manage the company's accounting accounts and classifications.</p>
     </div>
-    <button class="primary-btn" id="addButton" type="button">+ New Movement</button>
+
+    <button class="primary-btn" id="addButton" type="button">
+        + Add Account
+    </button>
 </div>
 
 <div id="message" class="message"></div>
 
 <div class="stats">
     <div class="stat">
-        <div class="stat-label">Inventory Items</div>
-        <div class="stat-value" id="totalItems">0</div>
+        <div class="stat-label">Total Accounts</div>
+        <div class="stat-value" id="totalAccounts">0</div>
     </div>
+
     <div class="stat">
-        <div class="stat-label">Total Units on Hand</div>
-        <div class="stat-value" id="totalStock">0</div>
+        <div class="stat-label">Active Accounts</div>
+        <div class="stat-value" id="activeAccounts">0</div>
     </div>
+
     <div class="stat">
-        <div class="stat-label">Stock In</div>
-        <div class="stat-value" id="totalIn">0</div>
+        <div class="stat-label">Inactive Accounts</div>
+        <div class="stat-value" id="inactiveAccounts">0</div>
     </div>
+
     <div class="stat">
-        <div class="stat-label">Stock Out</div>
-        <div class="stat-value" id="totalOut">0</div>
+        <div class="stat-label">Account Types</div>
+        <div class="stat-value">5</div>
     </div>
 </div>
 
 <div class="panel">
+
     <div class="toolbar">
-        <input type="search" id="searchInput" placeholder="Search transaction, item or reference...">
+        <input type="search" id="searchInput"
+               placeholder="Search account code or name...">
 
         <select id="typeFilter">
-            <option value="">All Movement Types</option>
-            <option value="Beginning Balance">Beginning Balance</option>
-            <option value="Stock In">Stock In</option>
-            <option value="Stock Out">Stock Out</option>
-            <option value="Adjustment In">Adjustment In</option>
-            <option value="Adjustment Out">Adjustment Out</option>
+            <option value="">All Account Types</option>
+            <option value="Assets">Assets</option>
+            <option value="Liabilities">Liabilities</option>
+            <option value="Equity">Equity</option>
+            <option value="Revenue">Revenue</option>
+            <option value="Expenses">Expenses</option>
         </select>
 
-        <input type="date" id="dateFilter">
+        <select id="statusFilter">
+            <option value="Active">Active Only</option>
+            <option value="Inactive">Inactive Only</option>
+            <option value="All">All Status</option>
+        </select>
     </div>
 
     <div class="table-wrapper">
         <table>
             <thead>
                 <tr>
-                    <th>Transaction No.</th>
-                    <th>Date</th>
-                    <th>Item Code</th>
-                    <th>Item Name</th>
-                    <th>Movement Type</th>
-                    <th>Quantity In</th>
-                    <th>Quantity Out</th>
-                    <th>Unit Cost</th>
-                    <th>Reference</th>
-                    <th>Warehouse</th>
+                    <th>Account Code</th>
+                    <th>Account Name</th>
+                    <th>Account Type</th>
+                    <th>Subtype</th>
+                    <th>Normal Balance</th>
+                    <th>Parent Account</th>
+                    <th>Status</th>
                     <th>Actions</th>
                 </tr>
             </thead>
-            <tbody id="movementTable">
-                <tr><td colspan="11" class="empty">Loading stock movements...</td></tr>
+
+            <tbody id="accountTable">
+                <tr>
+                    <td colspan="8" class="loading">Loading accounts...</td>
+                </tr>
             </tbody>
         </table>
     </div>
+
 </div>
 
-<!-- MOVEMENT MODAL -->
-<div class="modal" id="movementModal">
+<!-- ACCOUNT MODAL -->
+<div class="modal" id="accountModal">
     <div class="modal-content">
 
         <div class="modal-header">
-            <h3 id="modalTitle">New Stock Movement</h3>
+            <h3 id="modalTitle">Add New Account</h3>
             <button type="button" class="close-btn" id="closeModal">&times;</button>
         </div>
 
-        <form id="movementForm">
+        <form id="accountForm">
+
             <div class="form-grid">
 
                 <div class="field">
-                    <label for="movementDate">Transaction Date *</label>
-                    <input type="date" id="movementDate" required>
+                    <label for="accountCode">Account Code *</label>
+                    <input type="text" id="accountCode" required
+                           placeholder="e.g. 1000">
                 </div>
 
                 <div class="field">
-                    <label for="movementType">Movement Type *</label>
-                    <select id="movementType" required>
-                        <option value="Beginning Balance">Beginning Balance</option>
-                        <option value="Stock In">Stock In</option>
-                        <option value="Stock Out">Stock Out</option>
-                        <option value="Adjustment In">Adjustment In</option>
-                        <option value="Adjustment Out">Adjustment Out</option>
+                    <label for="accountName">Account Name *</label>
+                    <input type="text" id="accountName" required
+                           placeholder="e.g. Cash">
+                </div>
+
+                <div class="field">
+                    <label for="accountType">Account Type *</label>
+                    <select id="accountType" required>
+                        <option value="">Select Account Type</option>
+                        <option value="Assets">Assets</option>
+                        <option value="Liabilities">Liabilities</option>
+                        <option value="Equity">Equity</option>
+                        <option value="Revenue">Revenue</option>
+                        <option value="Expenses">Expenses</option>
+                    </select>
+                </div>
+
+                <div class="field">
+                    <label for="accountSubtype">Account Subtype</label>
+                    <input type="text" id="accountSubtype"
+                           placeholder="e.g. Current Asset">
+                </div>
+
+                <div class="field">
+                    <label for="normalBalance">Normal Balance</label>
+                    <input type="text" id="normalBalance" class="readonly"
+                           readonly>
+                </div>
+
+                <div class="field">
+                    <label for="parentAccount">Parent Account</label>
+                    <select id="parentAccount">
+                        <option value="">None - Main Account</option>
                     </select>
                 </div>
 
                 <div class="field full">
-                    <label for="itemSelect">Inventory Item *</label>
-                    <select id="itemSelect" required>
-                        <option value="">Select Inventory Item</option>
+                    <label for="description">Description</label>
+                    <textarea id="description"
+                              placeholder="Enter account description"></textarea>
+                </div>
+
+                <div class="field">
+                    <label for="accountStatus">Account Status</label>
+                    <select id="accountStatus">
+                        <option value="TRUE">Active</option>
+                        <option value="FALSE">Inactive</option>
                     </select>
-                    <small id="stockInfo">Select an item to view current stock.</small>
-                </div>
-
-                <div class="field">
-                    <label for="quantity">Quantity *</label>
-                    <input type="number" id="quantity" min="0.0001" step="any" required>
-                </div>
-
-                <div class="field">
-                    <label for="unitCost">Unit Cost</label>
-                    <input type="number" id="unitCost" min="0" step="0.0001" value="0">
-                </div>
-
-                <div class="field">
-                    <label for="referenceType">Reference Type</label>
-                    <select id="referenceType">
-                        <option value="Manual">Manual</option>
-                        <option value="Opening Balance">Opening Balance</option>
-                        <option value="Purchase">Purchase</option>
-                        <option value="Sales">Sales</option>
-                        <option value="Adjustment">Adjustment</option>
-                        <option value="Other">Other</option>
-                    </select>
-                </div>
-
-                <div class="field">
-                    <label for="referenceId">Reference Number</label>
-                    <input type="text" id="referenceId" maxlength="80" placeholder="e.g. PO-0001">
-                </div>
-
-                <div class="field">
-                    <label for="warehouse">Warehouse / Location</label>
-                    <input type="text" id="warehouse" maxlength="100" placeholder="Main Warehouse">
-                </div>
-
-                <div class="field full">
-                    <label for="memo">Memo / Remarks</label>
-                    <textarea id="memo" maxlength="500"></textarea>
                 </div>
 
             </div>
 
             <div class="modal-actions">
-                <button type="button" class="secondary-btn" id="cancelButton">Cancel</button>
-                <button type="submit" class="primary-btn" id="saveButton">Save Movement</button>
+                <button type="button" class="secondary-btn" id="cancelButton">
+                    Cancel
+                </button>
+
+                <button type="submit" class="primary-btn" id="saveButton">
+                    Save Account
+                </button>
             </div>
+
         </form>
     </div>
 </div>
@@ -222,11 +535,9 @@ import {
     getSheet,
     addRecord,
     updateRecord,
-    deleteRecord,
     saveExcel
 } from "../excel.js";
 
-/* SESSION */
 const session = JSON.parse(
     sessionStorage.getItem("accsystem_session") || "null"
 );
@@ -240,27 +551,26 @@ if (!session) {
 }
 
 const userAccess = session.Access || [];
-const isAdmin = String(session.Role || "").toLowerCase() === "administrator";
+const isAdmin = session.Role === "Administrator";
 
-/* PERMISSIONS - SAME PATTERN AS CHART OF ACCOUNTS */
 function hasPermission(permission) {
     if (isAdmin) return true;
 
     return userAccess.some(row =>
-        String(row.Module).trim() === "Inventory" &&
+        String(row.Module).trim() === "General Ledger" &&
         (row.CanView === true || String(row.CanView).toLowerCase() === "true") &&
         (row[permission] === true || String(row[permission]).toLowerCase() === "true")
     );
 }
 
 const canView = isAdmin || userAccess.some(row =>
-    String(row.Module).trim() === "Inventory" &&
+    String(row.Module).trim() === "General Ledger" &&
     (row.CanView === true || String(row.CanView).toLowerCase() === "true")
 );
 
 if (!canView) {
     document.body.innerHTML =
-        "<h2>Access Denied</h2><p>You do not have permission to view Stock Movement.</p>";
+        "<h2>Access Denied</h2><p>You do not have permission to view Chart of Accounts.</p>";
     throw new Error("Insufficient permissions");
 }
 
@@ -268,23 +578,21 @@ const canCreate = hasPermission("CanCreate");
 const canEdit = hasPermission("CanEdit");
 const canDelete = hasPermission("CanDelete");
 
-const SHEET_NAME = "InventoryTransactions";
+const SHEET_NAME = "ChartOfAccounts";
 
-const $ = id => document.getElementById(id);
+const message = document.getElementById("message");
+const accountTable = document.getElementById("accountTable");
+const modal = document.getElementById("accountModal");
+const form = document.getElementById("accountForm");
+const saveButton = document.getElementById("saveButton");
+const addButton = document.getElementById("addButton");
 
-const message = $("message");
-const movementTable = $("movementTable");
-const modal = $("movementModal");
-const form = $("movementForm");
-const saveButton = $("saveButton");
-const addButton = $("addButton");
-
-let items = [];
-let movements = [];
-let editingID = null;
+let accounts = [];
+let editingAccountID = null;
 let databaseReady = false;
 
-/* MESSAGE */
+addButton.style.display = canCreate ? "" : "none";
+
 function showMessage(text, type) {
     message.textContent = text;
     message.className = "message " + type;
@@ -295,12 +603,10 @@ function hideMessage() {
     message.className = "message";
 }
 
-/* HELPERS */
 function isActive(value) {
     return value === true ||
         String(value).toLowerCase() === "true" ||
-        String(value) === "1" ||
-        String(value).toLowerCase() === "yes";
+        String(value) === "1";
 }
 
 function escapeHTML(value) {
@@ -313,222 +619,171 @@ function escapeHTML(value) {
     })[char]);
 }
 
-function numberValue(value) {
-    const n = Number(value);
-    return Number.isFinite(n) ? n : 0;
+function getNormalBalance(type) {
+    return ["Assets", "Expenses"].includes(type)
+        ? "Debit"
+        : ["Liabilities", "Equity", "Revenue"].includes(type)
+            ? "Credit"
+            : "";
 }
 
-function formatNumber(value) {
-    return numberValue(value).toLocaleString(undefined, {
-        maximumFractionDigits: 4
-    });
-}
-
-function formatDate(value) {
-    if (!value) return "";
-
-    if (typeof value === "number") {
-        const date = new Date((value - 25569) * 86400000);
-        return isNaN(date) ? "" : date.toISOString().slice(0, 10);
-    }
-
-    return String(value).slice(0, 10);
-}
-
-function getItem(itemID) {
-    return items.find(item =>
-        String(item.ItemID) === String(itemID)
-    );
-}
-
-function getStock(itemID, excludedID = null) {
-    return movements.reduce((total, movement) => {
-        if (String(movement.ItemID) !== String(itemID)) return total;
-
-        if (
-            excludedID &&
-            String(movement.TransactionID) === String(excludedID)
-        ) return total;
-
-        return total +
-            numberValue(movement.QuantityIn) -
-            numberValue(movement.QuantityOut);
-    }, 0);
-}
-
-function isIncoming(type) {
-    return [
-        "Beginning Balance",
-        "Stock In",
-        "Adjustment In"
-    ].includes(type);
-}
-
-function generateID() {
+function generateAccountID() {
     let highest = 0;
 
-    movements.forEach(movement => {
-        const match = String(movement.TransactionID || "").match(/^IT(\d+)$/i);
+    accounts.forEach(account => {
+        const match = String(account.AccountID || "").match(/^A(\d+)$/i);
 
-        if (match) highest = Math.max(highest, Number(match[1]));
+        if (match) {
+            highest = Math.max(highest, Number(match[1]));
+        }
     });
 
-    return "IT" + String(highest + 1).padStart(4, "0");
+    return "A" + String(highest + 1).padStart(4, "0");
 }
 
-function generateTransactionNo() {
-    let highest = 0;
-
-    movements.forEach(movement => {
-        const match = String(movement.TransactionNo || "").match(/(\d+)$/);
-
-        if (match) highest = Math.max(highest, Number(match[1]));
-    });
-
-    return "ITR-" + String(highest + 1).padStart(6, "0");
-}
-
-/* ITEM SELECT */
-function populateItems() {
-    const select = $("itemSelect");
-
-    select.innerHTML = '<option value="">Select Inventory Item</option>';
-
-    items.forEach(item => {
-        const option = document.createElement("option");
-
-        option.value = item.ItemID;
-        option.textContent =
-            `${item.ItemCode || item.ItemID} - ${item.ItemName || ""}`;
-
-        select.appendChild(option);
-    });
-}
-
-/* STATISTICS */
 function updateStats() {
-    $("totalItems").textContent = items.length;
+    document.getElementById("totalAccounts").textContent =
+        accounts.length;
 
-    $("totalStock").textContent = formatNumber(
-        items.reduce((total, item) => total + getStock(item.ItemID), 0)
-    );
+    document.getElementById("activeAccounts").textContent =
+        accounts.filter(account => isActive(account.IsActive)).length;
 
-    $("totalIn").textContent = formatNumber(
-        movements.reduce((total, movement) =>
-            total + numberValue(movement.QuantityIn), 0)
-    );
-
-    $("totalOut").textContent = formatNumber(
-        movements.reduce((total, movement) =>
-            total + numberValue(movement.QuantityOut), 0)
-    );
+    document.getElementById("inactiveAccounts").textContent =
+        accounts.filter(account => !isActive(account.IsActive)).length;
 }
 
-/* TABLE */
-function renderMovements() {
-    const search = $("searchInput").value.trim().toLowerCase();
-    const type = $("typeFilter").value;
-    const date = $("dateFilter").value;
+function populateParentAccounts(currentID = null) {
+    const select = document.getElementById("parentAccount");
 
-    const filtered = movements.filter(movement => {
-        const item = getItem(movement.ItemID) || {};
+    select.innerHTML = '<option value="">None - Main Account</option>';
 
-        const searchable = [
-            movement.TransactionNo,
-            movement.ItemID,
-            item.ItemCode,
-            item.ItemName,
-            movement.ReferenceType,
-            movement.ReferenceID,
-            movement.Warehouse,
-            movement.Memo
-        ].join(" ").toLowerCase();
+    accounts
+        .filter(account =>
+            isActive(account.IsActive) &&
+            String(account.AccountID) !== String(currentID || "")
+        )
+        .sort((a, b) =>
+            String(a.AccountCode).localeCompare(String(b.AccountCode))
+        )
+        .forEach(account => {
+            const option = document.createElement("option");
 
-        return searchable.includes(search) &&
-            (!type || movement.TransactionType === type) &&
-            (!date || formatDate(movement.TransactionDate) === date);
+            option.value = account.AccountCode;
+            option.textContent =
+                account.AccountCode + " - " + account.AccountName;
+
+            select.appendChild(option);
+        });
+}
+
+function renderAccounts() {
+    const search = document.getElementById("searchInput")
+        .value.trim().toLowerCase();
+
+    const type = document.getElementById("typeFilter").value;
+    const status = document.getElementById("statusFilter").value;
+
+    const filtered = accounts.filter(account => {
+        const matchesSearch =
+            String(account.AccountCode || "").toLowerCase().includes(search) ||
+            String(account.AccountName || "").toLowerCase().includes(search);
+
+        const matchesType = !type || account.AccountType === type;
+
+        const active = isActive(account.IsActive);
+
+        const matchesStatus =
+            status === "All" ||
+            (status === "Active" && active) ||
+            (status === "Inactive" && !active);
+
+        return matchesSearch && matchesType && matchesStatus;
     });
 
-    filtered.sort((a, b) =>
-        formatDate(b.TransactionDate).localeCompare(formatDate(a.TransactionDate)) ||
-        String(b.TransactionNo || "").localeCompare(String(a.TransactionNo || ""))
-    );
-
-    movementTable.innerHTML = "";
+    accountTable.innerHTML = "";
 
     if (!filtered.length) {
-        movementTable.innerHTML =
-            '<tr><td colspan="11" class="empty">No stock movements found.</td></tr>';
-
+        accountTable.innerHTML =
+            '<tr><td colspan="8" class="empty">No accounts found.</td></tr>';
         updateStats();
         return;
     }
 
-    filtered.forEach(movement => {
-        const item = getItem(movement.ItemID) || {};
+    filtered.sort((a, b) =>
+        String(a.AccountCode).localeCompare(String(b.AccountCode))
+    );
+
+    filtered.forEach(account => {
+        const tr = document.createElement("tr");
+
+        const statusText = isActive(account.IsActive)
+            ? '<span class="status-active">Active</span>'
+            : '<span class="status-inactive">Inactive</span>';
+
+        const parent = account.ParentAccount
+            ? escapeHTML(account.ParentAccount)
+            : "-";
 
         const actions = `
-            ${canEdit ? `<button class="table-action" data-action="edit" data-id="${escapeHTML(movement.TransactionID)}">Edit</button>` : ""}
-            ${canDelete ? `<button class="table-action danger" data-action="delete" data-id="${escapeHTML(movement.TransactionID)}">Delete</button>` : ""}
+            ${canEdit ? `<button class="table-action" data-action="edit" data-id="${escapeHTML(account.AccountID)}">Edit</button>` : ""}
+            ${canDelete ? `<button class="table-action danger" data-action="toggle" data-id="${escapeHTML(account.AccountID)}">${isActive(account.IsActive) ? "Deactivate" : "Activate"}</button>` : ""}
         `;
 
-        const row = document.createElement("tr");
-
-        row.innerHTML = `
-            <td>${escapeHTML(movement.TransactionNo || "-")}</td>
-            <td>${escapeHTML(formatDate(movement.TransactionDate))}</td>
-            <td>${escapeHTML(item.ItemCode || movement.ItemID || "-")}</td>
-            <td>${escapeHTML(item.ItemName || "Unknown Item")}</td>
-            <td><span class="type-badge">${escapeHTML(movement.TransactionType || "-")}</span></td>
-            <td class="qty-in">${formatNumber(movement.QuantityIn)}</td>
-            <td class="qty-out">${formatNumber(movement.QuantityOut)}</td>
-            <td>${formatNumber(movement.UnitCost)}</td>
-            <td>${escapeHTML([movement.ReferenceType, movement.ReferenceID].filter(Boolean).join(" / ") || "-")}</td>
-            <td>${escapeHTML(movement.Warehouse || "-")}</td>
+        tr.innerHTML = `
+            <td class="account-code">${escapeHTML(account.AccountCode)}</td>
+            <td>${escapeHTML(account.AccountName)}</td>
+            <td><span class="type-badge">${escapeHTML(account.AccountType)}</span></td>
+            <td>${escapeHTML(account.AccountSubtype || "-")}</td>
+            <td>${escapeHTML(account.NormalBalance || "-")}</td>
+            <td>${parent}</td>
+            <td>${statusText}</td>
             <td>${actions || "-"}</td>
         `;
 
-        movementTable.appendChild(row);
+        accountTable.appendChild(tr);
     });
 
     updateStats();
 }
 
-/* MODAL */
-function openModal(movement = null) {
+function openModal(account = null) {
     hideMessage();
     form.reset();
 
-    editingID = movement ? movement.TransactionID : null;
+    editingAccountID = account ? account.AccountID : null;
 
-    $("modalTitle").textContent =
-        movement ? "Edit Stock Movement" : "New Stock Movement";
+    document.getElementById("modalTitle").textContent =
+        account ? "Edit Account" : "Add New Account";
 
-    $("movementDate").value =
-        movement?.TransactionDate || new Date().toISOString().slice(0, 10);
+    document.getElementById("accountCode").value =
+        account?.AccountCode || "";
 
-    $("movementType").value =
-        movement?.TransactionType || "Stock In";
+    document.getElementById("accountName").value =
+        account?.AccountName || "";
 
-    $("itemSelect").value =
-        movement?.ItemID || "";
+    document.getElementById("accountType").value =
+        account?.AccountType || "";
 
-    const incoming = isIncoming($("movementType").value);
+    document.getElementById("accountSubtype").value =
+        account?.AccountSubtype || "";
 
-    $("quantity").value = movement
-        ? (incoming ? movement.QuantityIn : movement.QuantityOut)
-        : "";
+    document.getElementById("normalBalance").value =
+        account?.NormalBalance || "";
 
-    $("unitCost").value = movement?.UnitCost ?? 0;
-    $("referenceType").value = movement?.ReferenceType || "Manual";
-    $("referenceId").value = movement?.ReferenceID || "";
-    $("warehouse").value = movement?.Warehouse || "";
-    $("memo").value = movement?.Memo || "";
+    document.getElementById("description").value =
+        account?.Description || "";
 
-    updateStockInfo();
+    document.getElementById("accountStatus").value =
+        account ? (isActive(account.IsActive) ? "TRUE" : "FALSE") : "TRUE";
 
-    $("movementType").disabled = false;
-    $("itemSelect").disabled = false;
+    populateParentAccounts(account?.AccountID);
+
+    document.getElementById("parentAccount").value =
+        account?.ParentAccount || "";
+
+    // Keep the account code fixed during editing.
+    document.getElementById("accountCode").readOnly = Boolean(account);
+    document.getElementById("accountCode").classList.toggle("readonly", Boolean(account));
 
     modal.classList.add("show");
 }
@@ -536,79 +791,57 @@ function openModal(movement = null) {
 function closeModal() {
     modal.classList.remove("show");
     form.reset();
-    editingID = null;
+    editingAccountID = null;
 }
 
-function updateStockInfo() {
-    const item = getItem($("itemSelect").value);
-
-    if (!item) {
-        $("stockInfo").textContent = "Select an item to view current stock.";
-        return;
-    }
-
-    const currentStock = getStock(item.ItemID, editingID);
-
-    $("stockInfo").textContent =
-        `Current on-hand: ${formatNumber(currentStock)} ${item.UnitOfMeasure || "units"}`;
+function refreshFromDatabase() {
+    accounts = getSheet(SHEET_NAME) || [];
+    renderAccounts();
 }
 
-/* EVENT LISTENERS */
-addButton.addEventListener("click", () => {
-    if (databaseReady && canCreate) {
-        openModal();
-    }
+document.getElementById("accountType").addEventListener("change", event => {
+    document.getElementById("normalBalance").value =
+        getNormalBalance(event.target.value);
 });
 
-$("closeModal").addEventListener("click", closeModal);
-$("cancelButton").addEventListener("click", closeModal);
+document.getElementById("searchInput").addEventListener("input", renderAccounts);
+document.getElementById("typeFilter").addEventListener("change", renderAccounts);
+document.getElementById("statusFilter").addEventListener("change", renderAccounts);
+
+addButton.addEventListener("click", () => {
+    if (databaseReady && canCreate) openModal();
+});
+
+document.getElementById("closeModal").addEventListener("click", closeModal);
+document.getElementById("cancelButton").addEventListener("click", closeModal);
 
 modal.addEventListener("click", event => {
     if (event.target === modal) closeModal();
 });
 
-$("searchInput").addEventListener("input", renderMovements);
-$("typeFilter").addEventListener("change", renderMovements);
-$("dateFilter").addEventListener("change", renderMovements);
-
-$("itemSelect").addEventListener("change", updateStockInfo);
-
-$("movementType").addEventListener("change", () => {
-    const type = $("movementType").value;
-
-    $("referenceType").value =
-        type === "Beginning Balance" ? "Opening Balance" :
-        type.startsWith("Adjustment") ? "Adjustment" :
-        type === "Stock In" ? "Purchase" :
-        type === "Stock Out" ? "Sales" : "Manual";
-
-    updateStockInfo();
-});
-
-/* EDIT AND DELETE */
-movementTable.addEventListener("click", async event => {
+accountTable.addEventListener("click", async event => {
     const button = event.target.closest("button[data-action]");
-
     if (!button) return;
 
-    const movement = movements.find(item =>
-        String(item.TransactionID) === String(button.dataset.id)
+    const account = accounts.find(
+        item => String(item.AccountID) === button.dataset.id
     );
 
-    if (!movement) return;
+    if (!account) return;
 
     if (button.dataset.action === "edit") {
         if (!canEdit) return;
-
-        openModal(movement);
+        openModal(account);
         return;
     }
 
-    if (button.dataset.action === "delete") {
+    if (button.dataset.action === "toggle") {
         if (!canDelete) return;
 
+        const nextStatus = !isActive(account.IsActive);
+
         const confirmed = confirm(
-            `Delete transaction ${movement.TransactionNo}? This will change the stock balance.`
+            `${nextStatus ? "Activate" : "Deactivate"} ${account.AccountCode} - ${account.AccountName}?`
         );
 
         if (!confirmed) return;
@@ -616,26 +849,34 @@ movementTable.addEventListener("click", async event => {
         try {
             button.disabled = true;
 
-            deleteRecord(
+            updateRecord(
                 SHEET_NAME,
-                "TransactionID",
-                movement.TransactionID
+                "AccountID",
+                account.AccountID,
+                {
+                    IsActive: nextStatus,
+                    UpdatedAt: new Date().toISOString()
+                }
             );
 
             await saveExcel();
-
             refreshFromDatabase();
 
-            showMessage("Stock movement successfully deleted.", "success");
+            showMessage(
+                "Account status successfully updated.",
+                "success"
+            );
 
         } catch (error) {
-            showMessage("Unable to delete movement: " + error.message, "error");
+            showMessage(
+                "Unable to update account: " + error.message,
+                "error"
+            );
             button.disabled = false;
         }
     }
 });
 
-/* SAVE MOVEMENT */
 form.addEventListener("submit", async event => {
     event.preventDefault();
     hideMessage();
@@ -645,46 +886,55 @@ form.addEventListener("submit", async event => {
         return;
     }
 
-    const itemID = $("itemSelect").value;
-    const item = getItem(itemID);
-    const type = $("movementType").value;
-    const quantity = numberValue($("quantity").value);
-    const unitCost = numberValue($("unitCost").value);
-    const incoming = isIncoming(type);
+    const accountCode = document.getElementById("accountCode").value.trim();
+    const accountName = document.getElementById("accountName").value.trim();
+    const accountType = document.getElementById("accountType").value;
+    const accountSubtype = document.getElementById("accountSubtype").value.trim();
+    const normalBalance = getNormalBalance(accountType);
+    const parentAccount = document.getElementById("parentAccount").value;
+    const description = document.getElementById("description").value.trim();
+    const active = document.getElementById("accountStatus").value === "TRUE";
 
-    if (!item) {
-        showMessage("Please select a valid Inventory item.", "error");
+    if (!accountCode || !accountName || !accountType) {
+        showMessage("Please complete all required fields.", "error");
         return;
     }
 
-    if (!(quantity > 0)) {
-        showMessage("Quantity must be greater than zero.", "error");
+    const duplicateCode = accounts.some(account =>
+        String(account.AccountCode).trim().toLowerCase() === accountCode.toLowerCase() &&
+        String(account.AccountID) !== String(editingAccountID || "")
+    );
+
+    if (duplicateCode) {
+        showMessage("Account Code already exists.", "error");
         return;
     }
 
-    if (unitCost < 0) {
-        showMessage("Unit Cost cannot be negative.", "error");
-        return;
-    }
-
-    const currentStock = getStock(itemID, editingID);
-
-    if (!incoming && quantity > currentStock) {
-        showMessage(
-            `Insufficient stock. Available quantity: ${formatNumber(currentStock)} ${item.UnitOfMeasure || "units"}.`,
-            "error"
+    if (parentAccount) {
+        const parent = accounts.find(
+            account => account.AccountCode === parentAccount
         );
-        return;
-    }
 
-    if (editingID && !canEdit) {
-        showMessage("You do not have edit permission.", "error");
-        return;
-    }
+        if (!parent || !isActive(parent.IsActive)) {
+            showMessage("Selected Parent Account is not available.", "error");
+            return;
+        }
 
-    if (!editingID && !canCreate) {
-        showMessage("You do not have create permission.", "error");
-        return;
+        if (parent.ParentAccount) {
+            showMessage(
+                "Only one parent level is supported in this version.",
+                "error"
+            );
+            return;
+        }
+
+        if (parent.AccountType !== accountType) {
+            showMessage(
+                "Parent Account must have the same Account Type.",
+                "error"
+            );
+            return;
+        }
     }
 
     saveButton.disabled = true;
@@ -693,81 +943,84 @@ form.addEventListener("submit", async event => {
     try {
         const now = new Date().toISOString();
 
-        if (editingID) {
+        if (editingAccountID) {
+            if (!canEdit) throw new Error("You do not have edit permission.");
+
+            const current = accounts.find(
+                item => String(item.AccountID) === String(editingAccountID)
+            );
+
+            if (current && isActive(current.IsActive) && !active) {
+                const hasActiveChildren = accounts.some(item =>
+                    item.ParentAccount === current.AccountCode &&
+                    isActive(item.IsActive)
+                );
+
+                if (hasActiveChildren) {
+                    throw new Error(
+                        "Deactivate or reassign the active subaccounts first."
+                    );
+                }
+            }
+
             updateRecord(
                 SHEET_NAME,
-                "TransactionID",
-                editingID,
+                "AccountID",
+                editingAccountID,
                 {
-                    TransactionDate: $("movementDate").value,
-                    ItemID: itemID,
-                    TransactionType: type,
-                    QuantityIn: incoming ? quantity : 0,
-                    QuantityOut: incoming ? 0 : quantity,
-                    UnitCost: unitCost,
-                    ReferenceType: $("referenceType").value,
-                    ReferenceID: $("referenceId").value.trim(),
-                    Warehouse: $("warehouse").value.trim(),
-                    Memo: $("memo").value.trim(),
+                    AccountName: accountName,
+                    AccountType: accountType,
+                    AccountSubtype: accountSubtype,
+                    NormalBalance: normalBalance,
+                    ParentAccount: parentAccount,
+                    Description: description,
+                    IsActive: active,
                     UpdatedAt: now
                 }
             );
 
         } else {
-            const newMovement = {
-                TransactionID: generateID(),
-                TransactionNo: generateTransactionNo(),
-                TransactionDate: $("movementDate").value,
-                ItemID: itemID,
-                TransactionType: type,
-                QuantityIn: incoming ? quantity : 0,
-                QuantityOut: incoming ? 0 : quantity,
-                UnitCost: unitCost,
-                ReferenceType: $("referenceType").value,
-                ReferenceID: $("referenceId").value.trim(),
-                Warehouse: $("warehouse").value.trim(),
-                Memo: $("memo").value.trim(),
+            if (!canCreate) throw new Error("You do not have create permission.");
+
+            const newAccount = {
+                AccountID: generateAccountID(),
+                AccountCode: accountCode,
+                AccountName: accountName,
+                AccountType: accountType,
+                AccountSubtype: accountSubtype,
+                NormalBalance: normalBalance,
+                ParentAccount: parentAccount,
+                Description: description,
+                IsActive: active,
                 CreatedAt: now,
-                CreatedBy: session.DisplayName || session.Username || ""
+                UpdatedAt: now
             };
 
-            addRecord(SHEET_NAME, newMovement);
+            addRecord(SHEET_NAME, newAccount);
         }
 
         await saveExcel();
-
         refreshFromDatabase();
         closeModal();
 
         showMessage(
-            editingID
-                ? "Stock movement successfully updated."
-                : "New stock movement successfully recorded.",
+            editingAccountID
+                ? "Account successfully updated."
+                : "New account successfully created.",
             "success"
         );
 
     } catch (error) {
-        showMessage("Unable to save movement: " + error.message, "error");
+        showMessage(
+            "Unable to save account: " + error.message,
+            "error"
+        );
     } finally {
         saveButton.disabled = false;
-        saveButton.textContent = "Save Movement";
+        saveButton.textContent = "Save Account";
     }
 });
 
-/* REFRESH DATABASE */
-function refreshFromDatabase() {
-    items = (getSheet("Items") || []).filter(item =>
-        isActive(item.IsActive) &&
-        String(item.ItemType || "").toLowerCase() === "inventory"
-    );
-
-    movements = getSheet(SHEET_NAME) || [];
-
-    populateItems();
-    renderMovements();
-}
-
-/* INITIALIZE - SAME PATTERN AS CHART OF ACCOUNTS */
 async function initialize() {
     try {
         const license = await validateLicense();
@@ -778,19 +1031,14 @@ async function initialize() {
 
         await readExcel();
 
-        refreshFromDatabase();
-
+        accounts = getSheet(SHEET_NAME) || [];
         databaseReady = true;
 
-        addButton.style.display = canCreate ? "" : "none";
-
-        if (!canEdit && !canDelete) {
-            // Table actions are hidden by permission.
-        }
+        renderAccounts();
 
     } catch (error) {
-        movementTable.innerHTML =
-            '<tr><td colspan="11" class="empty">Unable to load stock movements.</td></tr>';
+        accountTable.innerHTML =
+            `<tr><td colspan="8" class="empty">Unable to load accounts.</td></tr>`;
 
         showMessage(
             "Database connection failed: " + error.message,
