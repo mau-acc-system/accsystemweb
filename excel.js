@@ -1,263 +1,341 @@
-/* =========================================
-   ACCOUNTING SYSTEM
-   EXCEL DATABASE ENGINE
-   ========================================= */
-
 const CONFIG = {
-    owner: "mau-acc-system",
-    repo: "accsystemdb",
-    branch: "main",
-    file: "Excel-Database.xlsx"
+  owner: "mau-acc-system",
+  repo: "accsystemdb",
+  branch: "main",
+  file: "Excel-Database.xlsx"
 };
 
-const API_URL = `https://api.github.com/repos/${CONFIG.owner}/${CONFIG.repo}/contents/${encodeURIComponent(CONFIG.file)}`;
+const API_URL =
+  `https://api.github.com/repos/${CONFIG.owner}/${CONFIG.repo}/contents/${encodeURIComponent(CONFIG.file)}`;
 
 let githubToken = null;
 let workbook = null;
 let fileSHA = null;
 
-// =========================================
-// 1. CONFIGURATION
-// =========================================
+// ==============================
+// LICENSE
+// ==============================
 
 export function setGitHubToken(token) {
-    if (!token || !token.trim()) {
-        throw new Error("GitHub token is required.");
-    }
-
-    githubToken = token.trim();
+  githubToken = token?.trim() || null;
 }
 
-// =========================================
-// 2. API REQUEST
-// =========================================
+export function clearGitHubToken() {
+  githubToken = null;
+  workbook = null;
+  fileSHA = null;
+}
 
-async function githubRequest(url, options = {}) {
+export function hasLicense() {
+  return Boolean(githubToken);
+}
 
-    if (!githubToken) {
-        throw new Error("GitHub token not configured.");
-    }
+export async function validateLicense(token) {
+  if (!token || !token.trim()) {
+    return {
+      valid: false,
+      message: "Please enter your license."
+    };
+  }
 
-    const response = await fetch(url, {
-        ...options,
-        headers: {
-            "Accept": "application/vnd.github+json",
-            "Authorization": `Bearer ${githubToken}`,
-            "X-GitHub-Api-Version": "2022-11-28",
-            ...options.headers
-        }
-    });
+  githubToken = token.trim();
 
-    const data = await response.json();
+  try {
+    const response = await githubRequest(API_URL);
 
     if (!response.ok) {
-        throw new Error(
-            data.message || `GitHub error: ${response.status}`
-        );
+      githubToken = null;
+
+      return {
+        valid: false,
+        message: "Invalid license or database access denied."
+      };
     }
 
-    return data;
-}
-
-// =========================================
-// 3. READ EXCEL DATABASE
-// =========================================
-
-export async function readExcel() {
-
-    const data = await githubRequest(
-        `${API_URL}?ref=${encodeURIComponent(CONFIG.branch)}`
-    );
-
-    if (!data.content) {
-        throw new Error("Excel file content not found.");
-    }
-
-    const binary = atob(data.content.replace(/\s/g, ""));
-    const bytes = new Uint8Array(binary.length);
-
-    for (let i = 0; i < binary.length; i++) {
-        bytes[i] = binary.charCodeAt(i);
-    }
-
-    workbook = XLSX.read(bytes, {
-        type: "array"
-    });
-
+    const data = await response.json();
     fileSHA = data.sha;
 
-    return workbook;
-}
-
-// =========================================
-// 4. GET SHEET DATA
-// =========================================
-
-export function getSheet(sheetName) {
-
-    if (!workbook) {
-        throw new Error("Read Excel database first.");
-    }
-
-    const sheet = workbook.Sheets[sheetName];
-
-    if (!sheet) {
-        throw new Error(`Sheet '${sheetName}' not found.`);
-    }
-
-    return XLSX.utils.sheet_to_json(sheet, {
-        defval: ""
-    });
-}
-
-// =========================================
-// 5. ADD RECORD
-// =========================================
-
-export function addRecord(sheetName, record) {
-
-    if (!workbook) {
-        throw new Error("Read Excel database first.");
-    }
-
-    const sheet = workbook.Sheets[sheetName];
-
-    if (!sheet) {
-        throw new Error(`Sheet '${sheetName}' not found.`);
-    }
-
-    XLSX.utils.sheet_add_json(sheet, [record], {
-        skipHeader: true,
-        origin: -1
-    });
-
-    return true;
-}
-
-// =========================================
-// 6. UPDATE RECORD
-// =========================================
-
-export function updateRecord(
-    sheetName,
-    column,
-    value,
-    updates
-) {
-
-    if (!workbook) {
-        throw new Error("Read Excel database first.");
-    }
-
-    const records = getSheet(sheetName);
-
-    const index = records.findIndex(
-        row => String(row[column]) === String(value)
-    );
-
-    if (index === -1) {
-        throw new Error("Record not found.");
-    }
-
-    const updated = {
-        ...records[index],
-        ...updates
+    return {
+      valid: true,
+      message: "License verified."
     };
 
-    records[index] = updated;
-
-    workbook.Sheets[sheetName] =
-        XLSX.utils.json_to_sheet(records);
-
-    return true;
-}
-
-// =========================================
-// 7. DELETE RECORD
-// =========================================
-
-export function deleteRecord(
-    sheetName,
-    column,
-    value
-) {
-
-    if (!workbook) {
-        throw new Error("Read Excel database first.");
-    }
-
-    const records = getSheet(sheetName);
-
-    const filtered = records.filter(
-        row => String(row[column]) !== String(value)
-    );
-
-    if (filtered.length === records.length) {
-        throw new Error("Record not found.");
-    }
-
-    workbook.Sheets[sheetName] =
-        XLSX.utils.json_to_sheet(filtered);
-
-    return true;
-}
-
-// =========================================
-// 8. SAVE EXCEL TO GITHUB
-// =========================================
-
-export async function saveExcel(message = "Update Excel database") {
-
-    if (!workbook || !fileSHA) {
-        throw new Error("Load Excel database before saving.");
-    }
-
-    const base64 = XLSX.write(workbook, {
-        bookType: "xlsx",
-        type: "base64"
-    });
-
-    const result = await githubRequest(API_URL, {
-        method: "PUT",
-
-        headers: {
-            "Content-Type": "application/json"
-        },
-
-        body: JSON.stringify({
-            message,
-            content: base64,
-            sha: fileSHA,
-            branch: CONFIG.branch
-        })
-    });
-
-    fileSHA = result.content.sha;
+  } catch (error) {
+    githubToken = null;
 
     return {
-        success: true,
-        message: "Excel database successfully updated!",
-        sha: fileSHA
+      valid: false,
+      message: error.message
     };
+  }
 }
 
-// =========================================
-// 9. GET AVAILABLE SHEETS
-// =========================================
+// ==============================
+// GITHUB API
+// ==============================
+
+async function githubRequest(url, options = {}) {
+  if (!githubToken) {
+    throw new Error("License required.");
+  }
+
+  return fetch(url, {
+    ...options,
+    headers: {
+      "Authorization": `Bearer ${githubToken}`,
+      "Accept": "application/vnd.github+json",
+      "X-GitHub-Api-Version": "2022-11-28",
+      ...options.headers
+    }
+  });
+}
+
+// ==============================
+// READ EXCEL
+// ==============================
+
+export async function readExcel() {
+  if (!githubToken) {
+    throw new Error("License required.");
+  }
+
+  if (typeof XLSX === "undefined") {
+    throw new Error("SheetJS library is not loaded.");
+  }
+
+  const response = await githubRequest(API_URL);
+
+  if (!response.ok) {
+    throw new Error("Unable to access Excel database.");
+  }
+
+  const data = await response.json();
+
+  if (!data.content) {
+    throw new Error("Excel database content is empty or unavailable.");
+  }
+
+  const binary = atob(data.content.replace(/\s/g, ""));
+  const bytes = new Uint8Array(binary.length);
+
+  for (let i = 0; i < binary.length; i++) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+
+  workbook = XLSX.read(bytes, {
+    type: "array"
+  });
+
+  fileSHA = data.sha;
+
+  return getSheetNames();
+}
+
+// ==============================
+// SHEET FUNCTIONS
+// ==============================
 
 export function getSheetNames() {
+  if (!workbook) {
+    throw new Error("Database not loaded.");
+  }
 
-    if (!workbook) {
-        throw new Error("Read Excel database first.");
-    }
-
-    return workbook.SheetNames;
+  return workbook.SheetNames;
 }
 
-// =========================================
-// 10. DATABASE STATUS
-// =========================================
+export function getSheet(sheetName) {
+  if (!workbook) {
+    throw new Error("Database not loaded.");
+  }
+
+  const sheet = workbook.Sheets[sheetName];
+
+  if (!sheet) {
+    throw new Error(`Sheet not found: ${sheetName}`);
+  }
+
+  return XLSX.utils.sheet_to_json(sheet, {
+    defval: ""
+  });
+}
+
+// ==============================
+// ADD RECORD
+// ==============================
+
+export function addRecord(sheetName, record) {
+  const sheet = getWorksheet(sheetName);
+  const headers = getHeaders(sheet);
+
+  const invalidFields = Object.keys(record).filter(
+    key => !headers.includes(key)
+  );
+
+  if (invalidFields.length) {
+    throw new Error(
+      `Unknown column(s): ${invalidFields.join(", ")}`
+    );
+  }
+
+  const newRecord = {};
+
+  headers.forEach(header => {
+    newRecord[header] = record[header] ?? "";
+  });
+
+  XLSX.utils.sheet_add_json(sheet, [newRecord], {
+    header: headers,
+    skipHeader: true,
+    origin: -1
+  });
+
+  return true;
+}
+
+// ==============================
+// UPDATE RECORD
+// ==============================
+
+export function updateRecord(
+  sheetName,
+  column,
+  value,
+  updates
+) {
+  const sheet = getWorksheet(sheetName);
+  const headers = getHeaders(sheet);
+  const records = getSheet(sheetName);
+
+  const index = records.findIndex(
+    row => String(row[column]) === String(value)
+  );
+
+  if (index === -1) {
+    throw new Error("Record not found.");
+  }
+
+  Object.assign(records[index], updates);
+
+  rebuildSheet(sheetName, headers, records);
+
+  return true;
+}
+
+// ==============================
+// DELETE RECORD
+// ==============================
+
+export function deleteRecord(
+  sheetName,
+  column,
+  value
+) {
+  const sheet = getWorksheet(sheetName);
+  const headers = getHeaders(sheet);
+  const records = getSheet(sheetName);
+
+  const filtered = records.filter(
+    row => String(row[column]) !== String(value)
+  );
+
+  if (filtered.length === records.length) {
+    throw new Error("Record not found.");
+  }
+
+  rebuildSheet(sheetName, headers, filtered);
+
+  return true;
+}
+
+// ==============================
+// SAVE EXCEL
+// ==============================
+
+export async function saveExcel(
+  message = "Update Excel database"
+) {
+  if (!githubToken) {
+    throw new Error("License required.");
+  }
+
+  if (!workbook) {
+    throw new Error("Database not loaded.");
+  }
+
+  const content = XLSX.write(workbook, {
+    bookType: "xlsx",
+    type: "base64"
+  });
+
+  const response = await githubRequest(API_URL, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      message,
+      content,
+      sha: fileSHA,
+      branch: CONFIG.branch
+    })
+  });
+
+  if (!response.ok) {
+    if (response.status === 409 || response.status === 422) {
+      throw new Error(
+        "Database conflict. Reload the database before saving again."
+      );
+    }
+
+    throw new Error("Failed to save Excel database.");
+  }
+
+  const result = await response.json();
+
+  fileSHA = result.content.sha;
+
+  return true;
+}
+
+// ==============================
+// INTERNAL HELPERS
+// ==============================
+
+function getWorksheet(sheetName) {
+  if (!workbook) {
+    throw new Error("Database not loaded.");
+  }
+
+  const sheet = workbook.Sheets[sheetName];
+
+  if (!sheet) {
+    throw new Error(`Sheet not found: ${sheetName}`);
+  }
+
+  return sheet;
+}
+
+function getHeaders(sheet) {
+  const rows = XLSX.utils.sheet_to_json(sheet, {
+    header: 1,
+    defval: ""
+  });
+
+  return rows[0] || [];
+}
+
+function rebuildSheet(sheetName, headers, records) {
+  const newSheet = XLSX.utils.json_to_sheet(records, {
+    header: headers
+  });
+
+  workbook.Sheets[sheetName] = newSheet;
+}
+
+// ==============================
+// DATABASE STATUS
+// ==============================
 
 export function isDatabaseLoaded() {
-    return workbook !== null;
+  return Boolean(workbook);
 }
