@@ -70,6 +70,11 @@ const n = v => Number(v) || 0;
 
 const now = () => new Date().toISOString();
 
+const withUpdatedAt = updates =>
+  cfg.updatedAtField === false
+    ? updates
+    : { ...updates, UpdatedAt: now() };
+
 const id = (prefix, arr, key) =>
   prefix +
   String(
@@ -308,7 +313,7 @@ async function saveEditModal(e) {
       cfg.sheet,
       cfg.key,
       editingRecord[cfg.key],
-      { ...changes, UpdatedAt: now() }
+      withUpdatedAt(changes)
     );
 
     await saveExcel();
@@ -465,7 +470,9 @@ $("form").addEventListener("submit", async e => {
     }
 
     rec.CreatedAt = t;
-    rec.UpdatedAt = t;
+    if (cfg.updatedAtField !== false) {
+      rec.UpdatedAt = t;
+    }
 
     if (cfg.defaults) {
       const defaultValues =
@@ -526,10 +533,7 @@ $("tableBody").addEventListener("click", async e => {
         cfg.sheet,
         cfg.key,
         r[cfg.key],
-        {
-          IsActive: false,
-          UpdatedAt: now()
-        }
+        withUpdatedAt({ IsActive: false })
       );
 
       await saveExcel();
@@ -551,7 +555,8 @@ $("tableBody").addEventListener("click", async e => {
     if (!allowed("CanEdit")) return;
     const r = data[Number(edit)];
     openEditModal(r);
-  }});
+  }
+});
 
 // ==========================================
 // INITIALIZE
