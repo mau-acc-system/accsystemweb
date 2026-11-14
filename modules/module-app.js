@@ -127,7 +127,7 @@ function checkDuplicates(record) {
 // SELECT OPTIONS
 // ==========================================
 
-function options(field) {
+function options(field, selectedValue = "") {
   if (!field.options) return "";
 
   let vals = [];
@@ -141,7 +141,6 @@ function options(field) {
 
   return vals.map(x => {
     const value = x[field.valueKey || "CustomerID"];
-
     const label =
       x[field.labelKey || "CustomerName"] ||
       x.AccountName ||
@@ -149,35 +148,27 @@ function options(field) {
       x.BankName ||
       x.CashAccountName ||
       value;
-
-    return `<option value="${esc(value)}">${esc(label)}</option>`;
+    const selected = String(value) === String(selectedValue) ? "selected" : "";
+    return `<option value="${esc(value)}" ${selected}>${esc(label)}</option>`;
   }).join("");
 }
 
-// ==========================================
-// INPUT GENERATOR
-// ==========================================
-
-function input(f) {
-  const v = f.value || "";
+function input(f, value = undefined, editMode = false) {
+  const v = value !== undefined ? value : (f.value || "");
 
   if (f.type === "select") {
-    return `
-      <select name="${f.name}" ${f.required ? "required" : ""}>
-        ${
-          f.options
-            ? options(f)
-            : f.choices.map(x =>
-                `<option>${esc(x)}</option>`
-              ).join("")
-        }
-      </select>
-    `;
+    const choices = f.options
+      ? options(f, v)
+      : (f.choices || []).map(x =>
+          `<option value="${esc(x)}" ${String(x) === String(v) ? "selected" : ""}>${esc(x)}</option>`
+        ).join("");
+
+    return `<select name="${esc(f.name)}" ${f.required ? "required" : ""}>${choices}</select>`;
   }
 
   return `
     <input
-      name="${f.name}"
+      name="${esc(f.name)}"
       type="${f.type || "text"}"
       value="${esc(v)}"
       ${f.required ? "required" : ""}
@@ -185,6 +176,154 @@ function input(f) {
       ${f.min !== undefined ? `min="${f.min}"` : ""}
     >
   `;
+}
+
+// ==========================================
+// EDIT MODAL
+// ==========================================
+
+function ensureEditModal() {
+  if ($("editModal")) return;
+
+  const style = document.createElement("style");
+  style.textContent = `
+    .acc-modal-backdrop {
+      position: fixed; inset: 0; z-index: 9999;
+      display: none; align-items: center; justify-content: center;
+      padding: 20px; background: rgba(15, 23, 42, .48);
+    }
+    .acc-modal {
+      width: min(680px, 100%); max-height: 90vh; overflow: auto;
+      background: #fff; border-radius: 14px; padding: 22px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.22);
+    }
+    .acc-modal h3 { margin: 0 0 6px; color: #26364e; font-size: 19px; }
+    .acc-modal .acc-modal-desc { margin: 0 0 18px; color: #8993a5; font-size: 13px; }
+    .acc-modal .acc-modal-actions {
+      display: flex; justify-content: flex-end; gap: 9px; margin-top: 20px;
+    }
+    .acc-modal .secondary { background: #eef2f8; color: #42516a; }
+    .acc-modal .modal-error {
+      display: none; margin-top: 12px; padding: 10px;
+      border-radius: 7px; background: #fff0f0; color: #c03939; font-size: 12px;
+    }
+    @media (max-width: 560px) {
+      .acc-modal-backdrop { padding: 10px; }
+      .acc-modal { padding: 16px; }
+      .acc-modal .grid { grid-template-columns: 1fr; }
+    }
+  `;
+  document.head.appendChild(style);
+
+  const backdrop = document.createElement("div");
+  backdrop.id = "editModal";
+  backdrop.className = "acc-modal-backdrop";
+  backdrop.innerHTML = `
+    <section class="acc-modal" role="dialog" aria-modal="true" aria-labelledby="editModalTitle">
+      <h3 id="editModalTitle">Edit Record</h3>
+      <p class="acc-modal-desc">Update the record details below.</p>
+      <form id="editForm">
+        <div class="grid" id="editFormFields"></div>
+        <div id="editError" class="modal-error"></div>
+        <div class="acc-modal-actions">
+          <button type="button" class="secondary" id="cancelEdit">Cancel</button>
+          <button type="submit" id="updateRecordButton">Save Changes</button>
+        </div>
+      </form>
+    </section>
+  `;
+  document.body.appendChild(backdrop);
+
+  $("cancelEdit").addEventListener("click", closeEditModal);
+  backdrop.addEventListener("click", e => {
+    if (e.target === backdrop) closeEditModal();
+  });
+  $("editForm").addEventListener("submit", saveEditModal);
+}
+
+let editingRecord = null;
+
+function closeEditModal() {
+  const modal = $("editModal");
+  if (modal) modal.style.display = "none";
+  editingRecord = null;
+}
+
+function openEditModal(record) {
+  editingRecord = record;
+  ensureEditModal();
+
+  $("editModalTitle").textContent = `Edit ${cfg.title}`;
+  $("editFormFields").innerHTML = cfg.fields.map(f => `
+    <label>
+      ${esc(f.label)}
+      ${input(f, record[f.name] ?? "")}
+    </label>
+  `).join("");
+
+  $("editError").style.display = "none";
+  $("editError").textContent = "";
+  $("updateRecordButton").disabled = false;
+  $("editModal").style.display = "flex";
+}
+
+async function saveEditModal(e) {
+  e.preventDefault();
+  if (!editingRecord) return;
+
+  const button = $("updateRecordButton");
+  const errorBox = $("editError");
+
+  try {
+    if (!allowed("CanEdit")) throw new Error("No edit permission");
+
+    button.disabled = true;
+    errorBox.style.display = "none";
+
+    const fd = new FormData(e.target);
+    const changes = {};
+
+    cfg.fields.forEach(f => {
+      changes[f.name] = fd.get(f.name);
+      if (f.type === "number") changes[f.name] = n(changes[f.name]);
+    });
+
+    // Prevent duplicate unique values, excluding the record being edited.
+    for (const field of (cfg.uniqueFields || [])) {
+      const value = String(changes[field] ?? "").trim().toLowerCase();
+      if (!value) continue;
+
+      const duplicate = data.some(row =>
+        String(row[field] ?? "").trim().toLowerCase() === value &&
+        String(row[cfg.key]) !== String(editingRecord[cfg.key])
+      );
+
+      if (duplicate) {
+        const fieldConfig = cfg.fields.find(f => f.name === field);
+        throw new Error(`${fieldConfig?.label || field} already exists. Duplicate records are not allowed.`);
+      }
+    }
+
+    updateRecord(
+      cfg.sheet,
+      cfg.key,
+      editingRecord[cfg.key],
+      { ...changes, UpdatedAt: now() }
+    );
+
+    await saveExcel();
+
+    data = getSheet(cfg.sheet);
+    render();
+    closeEditModal();
+    message("Record updated successfully.");
+  } catch (err) {
+    console.error("EDIT ERROR:", err);
+    errorBox.textContent = err.message;
+    errorBox.style.display = "block";
+  } finally {
+    button.disabled = false;
+  }
 }
 
 // ==========================================
@@ -407,78 +546,12 @@ $("tableBody").addEventListener("click", async e => {
     }
   }
 
-  // EDIT
+  // EDIT: open a structured modal instead of browser prompt dialogs
   else if (edit !== undefined) {
-    const r = data[Number(edit)];
-
     if (!allowed("CanEdit")) return;
-
-    const changes = {};
-
-    for (const f of cfg.fields) {
-      const v = prompt(
-        "Edit " + f.label,
-        r[f.name] ?? ""
-      );
-
-      if (v === null) return;
-
-      changes[f.name] =
-        f.type === "number" ? n(v) : v;
-    }
-
-    try {
-      // CHECK DUPLICATES AGAINST OTHER RECORDS
-      const uniqueFields = cfg.uniqueFields || [];
-
-      for (const field of uniqueFields) {
-        const value = String(changes[field] ?? "")
-          .trim()
-          .toLowerCase();
-
-        if (!value) continue;
-
-        const duplicate = data.some(row =>
-          String(row[field] ?? "")
-            .trim()
-            .toLowerCase() === value &&
-          String(row[cfg.key]) !== String(r[cfg.key])
-        );
-
-        if (duplicate) {
-          const fieldConfig = cfg.fields.find(f => f.name === field);
-          const label = fieldConfig?.label || field;
-
-          throw new Error(
-            `${label} already exists. Duplicate records are not allowed.`
-          );
-        }
-      }
-
-      updateRecord(
-        cfg.sheet,
-        cfg.key,
-        r[cfg.key],
-        {
-          ...changes,
-          UpdatedAt: now()
-        }
-      );
-
-      await saveExcel();
-
-      data = getSheet(cfg.sheet);
-
-      render();
-
-      message("Record updated.");
-
-    } catch (err) {
-      console.error("EDIT ERROR:", err);
-      message(err.message, true);
-    }
-  }
-});
+    const r = data[Number(edit)];
+    openEditModal(r);
+  }});
 
 // ==========================================
 // INITIALIZE
