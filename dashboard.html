@@ -8,400 +8,62 @@
 
 <style>
 :root {
-    --navy: #101b35;
-    --navy2: #172544;
-    --blue: #315efb;
-    --bg: #f4f6fa;
-    --white: #ffffff;
-    --text: #202b3c;
-    --muted: #8993a5;
-    --border: #e8ecf2;
-    --sidebar-width: 265px;
-    --header-height: 68px;
+    --navy:#101b35;--navy2:#172544;--blue:#315efb;
+    --bg:#f4f6fa;--white:#fff;--text:#202b3c;
+    --muted:#8993a5;--border:#e8ecf2;
+    --sidebar-width:265px;--header-height:68px;
 }
-
-* {
-    box-sizing: border-box;
-}
-
-body {
-    margin: 0;
-    font-family: Arial, Helvetica, sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    overflow: hidden;
-}
-
-/* SIDEBAR */
-.sidebar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    width: var(--sidebar-width);
-    background: var(--navy);
-    color: white;
-    display: flex;
-    flex-direction: column;
-    z-index: 100;
-}
-
-.brand {
-    height: var(--header-height);
-    min-height: var(--header-height);
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 0 22px;
-    border-bottom: 1px solid rgba(255,255,255,.08);
-}
-
-.brand-logo {
-    width: 34px;
-    height: 34px;
-    border-radius: 9px;
-    background: var(--blue);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    font-size: 17px;
-}
-
-.brand-name {
-    font-size: 16px;
-    font-weight: bold;
-    letter-spacing: .5px;
-}
-
-.sidebar-scroll {
-    flex: 1;
-    overflow-y: auto;
-    padding: 15px 12px 25px;
-}
-
-.menu-label {
-    color: #8290aa;
-    font-size: 10px;
-    font-weight: bold;
-    letter-spacing: 1.2px;
-    padding: 15px 12px 8px;
-}
-
-.menu-item,
-.task-item {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    gap: 11px;
-    padding: 11px 12px;
-    color: #c4cee0;
-    text-decoration: none;
-    border: 0;
-    border-radius: 7px;
-    background: transparent;
-    cursor: pointer;
-    font-size: 13px;
-    text-align: left;
-    transition: .15s;
-}
-
-.menu-item:hover,
-.task-item:hover {
-    background: rgba(255,255,255,.08);
-    color: white;
-}
-
-.menu-item.active,
-.task-item.active {
-    background: var(--blue);
-    color: white;
-}
-
-.menu-icon {
-    width: 19px;
-    text-align: center;
-    font-size: 15px;
-}
-
-.menu-arrow {
-    margin-left: auto;
-    font-size: 11px;
-    transition: transform .2s;
-}
-
-.menu-group.open > .menu-item .menu-arrow {
-    transform: rotate(90deg);
-}
-
-.submenu {
-    display: none;
-    padding: 4px 0 5px 17px;
-}
-
-.menu-group.open > .submenu {
-    display: block;
-}
-
-.task-item {
-    padding: 9px 10px;
-    font-size: 12px;
-    gap: 8px;
-}
-
-.task-item .task-icon {
-    width: 17px;
-    text-align: center;
-    opacity: .85;
-}
-
-.favorite-star {
-    margin-left: auto;
-    color: #f5c451;
-    font-size: 16px;
-    line-height: 1;
-    cursor: pointer;
-    padding: 2px 4px;
-    border: 0;
-    background: transparent;
-}
-
-.favorite-star:hover {
-    transform: scale(1.15);
-}
-
-.favorite-empty {
-    color: #8290aa;
-    font-size: 11px;
-    padding: 8px 12px 12px;
-}
-
-/* MAIN AREA */
-.main {
-    position: fixed;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: var(--sidebar-width);
-    display: flex;
-    flex-direction: column;
-    min-width: 0;
-}
-
-/* FIXED HEADER */
-.header {
-    height: var(--header-height);
-    min-height: var(--header-height);
-    background: white;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 25px;
-    z-index: 50;
-}
-
-.header-title {
-    font-size: 17px;
-    font-weight: bold;
-}
-
-.header-right {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
-
-.user-info {
-    text-align: right;
-}
-
-.user-name {
-    font-size: 13px;
-    font-weight: bold;
-}
-
-.user-role {
-    font-size: 11px;
-    color: var(--muted);
-    margin-top: 3px;
-}
-
-.avatar {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    background: #e9efff;
-    color: var(--blue);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    font-size: 13px;
-}
-
-.logout {
-    border: 1px solid var(--border);
-    background: white;
-    padding: 8px 12px;
-    border-radius: 6px;
-    cursor: pointer;
-    color: #596579;
-    font-size: 12px;
-}
-
-.logout:hover {
-    background: #fff0f0;
-    color: #d33;
-}
-
-/* SCROLLABLE CONTENT */
-.content-area {
-    flex: 1;
-    min-height: 0;
-    overflow: auto;
-    background: var(--bg);
-}
-
-#contentFrame {
-    width: 100%;
-    height: 100%;
-    min-height: 100%;
-    display: block;
-    border: 0;
-    background: var(--bg);
-}
-
-.dashboard-content {
-    padding: 28px;
-}
-
-.welcome {
-    margin-bottom: 25px;
-}
-
-.welcome h2 {
-    margin: 0 0 7px;
-    font-size: 23px;
-}
-
-.welcome p {
-    margin: 0;
-    color: var(--muted);
-    font-size: 13px;
-}
-
-.cards {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(150px, 1fr));
-    gap: 17px;
-}
-
-.card {
-    background: white;
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 20px;
-}
-
-.card-label {
-    color: var(--muted);
-    font-size: 12px;
-}
-
-.card-value {
-    font-size: 25px;
-    font-weight: bold;
-    margin-top: 12px;
-}
-
-.card-note {
-    color: #9aa3b2;
-    font-size: 11px;
-    margin-top: 7px;
-}
-
-.placeholder {
-    margin-top: 22px;
-    background: white;
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 22px;
-}
-
-.placeholder h3 {
-    margin: 0 0 10px;
-    font-size: 15px;
-}
-
-.placeholder p {
-    color: var(--muted);
-    font-size: 13px;
-    margin: 0;
-}
-
-@media(max-width: 900px) {
-    :root {
-        --sidebar-width: 220px;
-    }
-
-    .cards {
-        grid-template-columns: repeat(2, minmax(130px, 1fr));
-    }
-}
-
-@media(max-width: 600px) {
-    :root {
-        --sidebar-width: 185px;
-        --header-height: 60px;
-    }
-
-    .brand {
-        padding: 0 12px;
-    }
-
-    .brand-name {
-        font-size: 13px;
-    }
-
-    .header {
-        padding: 0 12px;
-    }
-
-    .header-title {
-        font-size: 14px;
-    }
-
-    .user-role {
-        display: none;
-    }
-
-    .logout {
-        padding: 7px;
-    }
-
-    .dashboard-content {
-        padding: 17px;
-    }
-
-    .cards {
-        grid-template-columns: 1fr;
-    }
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text);overflow:hidden}
+.sidebar{position:fixed;top:0;left:0;bottom:0;width:var(--sidebar-width);background:var(--navy);color:white;display:flex;flex-direction:column;z-index:100}
+.brand{height:var(--header-height);min-height:var(--header-height);display:flex;align-items:center;gap:12px;padding:0 22px;border-bottom:1px solid rgba(255,255,255,.08)}
+.brand-logo{width:34px;height:34px;border-radius:9px;background:var(--blue);display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:17px}
+.brand-name{font-size:16px;font-weight:bold;letter-spacing:.5px}
+.sidebar-scroll{flex:1;overflow-y:auto;padding:15px 12px 25px}
+.menu-label{color:#8290aa;font-size:10px;font-weight:bold;letter-spacing:1.2px;padding:15px 12px 8px}
+.menu-item,.task-item{width:100%;display:flex;align-items:center;gap:11px;padding:11px 12px;color:#c4cee0;text-decoration:none;border:0;border-radius:7px;background:transparent;cursor:pointer;font-size:13px;text-align:left;transition:.15s}
+.menu-item:hover,.task-item:hover{background:rgba(255,255,255,.08);color:white}
+.menu-item.active,.task-item.active{background:var(--blue);color:white}
+.menu-icon{width:19px;text-align:center;font-size:15px}
+.menu-arrow{margin-left:auto;font-size:11px;transition:transform .2s}
+.menu-group.open>.menu-item .menu-arrow{transform:rotate(90deg)}
+.submenu{display:none;padding:4px 0 5px 17px}
+.menu-group.open>.submenu{display:block}
+.task-item{padding:9px 10px;font-size:12px;gap:8px}
+.task-item .task-icon{width:17px;text-align:center;opacity:.85}
+.favorite-star{margin-left:auto;color:#f5c451;font-size:16px;line-height:1;cursor:pointer;padding:2px 4px;border:0;background:transparent}
+.favorite-star:hover{transform:scale(1.15)}
+.favorite-empty{color:#8290aa;font-size:11px;padding:8px 12px 12px}
+.main{position:fixed;top:0;right:0;bottom:0;left:var(--sidebar-width);display:flex;flex-direction:column;min-width:0}
+.header{height:var(--header-height);min-height:var(--header-height);background:white;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 25px;z-index:50}
+.header-title{font-size:17px;font-weight:bold}
+.header-right{display:flex;align-items:center;gap:15px}
+.user-info{text-align:right}
+.user-name{font-size:13px;font-weight:bold}
+.user-role{font-size:11px;color:var(--muted);margin-top:3px}
+.avatar{width:36px;height:36px;border-radius:50%;background:#e9efff;color:var(--blue);display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:13px}
+.logout{border:1px solid var(--border);background:white;padding:8px 12px;border-radius:6px;cursor:pointer;color:#596579;font-size:12px}
+.logout:hover{background:#fff0f0;color:#d33}
+.content-area{flex:1;min-height:0;overflow:auto;background:var(--bg)}
+#contentFrame{width:100%;height:100%;min-height:100%;display:block;border:0;background:var(--bg)}
+@media(max-width:900px){:root{--sidebar-width:220px}}
+@media(max-width:600px){
+:root{--sidebar-width:185px;--header-height:60px}
+.brand{padding:0 12px}.brand-name{font-size:13px}
+.header{padding:0 12px}.header-title{font-size:14px}
+.user-role{display:none}.logout{padding:7px}
 }
 </style>
 </head>
 
 <body>
-
 <aside class="sidebar">
-
     <div class="brand">
         <div class="brand-logo">A</div>
         <div class="brand-name">ACC SYSTEM</div>
     </div>
 
     <div class="sidebar-scroll">
-
         <div class="menu-label">QUICK ACCESS</div>
 
         <div class="menu-group" id="favoritesGroup">
@@ -418,9 +80,8 @@ body {
         <div class="menu-label">WORKSPACE</div>
 
         <a class="menu-item active" href="dashboard.html" target="contentFrame"
-           onclick="setActive(this, 'Dashboard')">
-            <span class="menu-icon">⌂</span>
-            <span>Dashboard</span>
+           onclick="setActive(this,'Dashboard')">
+            <span class="menu-icon">⌂</span><span>Dashboard</span>
         </a>
 
         <div class="menu-label">MODULES</div>
@@ -429,38 +90,30 @@ body {
 
             <div class="menu-group" data-module="Banks">
                 <button class="menu-item" onclick="toggleGroup(this.parentElement)">
-                    <span class="menu-icon">▣</span>
-                    <span>Banks</span>
-                    <span class="menu-arrow">›</span>
+                    <span class="menu-icon">▣</span><span>Banks</span><span class="menu-arrow">›</span>
                 </button>
                 <div class="submenu">
-                    <a class="task-item" href="modules/banks.html" target="contentFrame"
-                       data-task="Bank Accounts" onclick="openTask(this)">
+                    <a class="task-item" href="modules/banks.html" target="contentFrame" data-task="Bank Accounts" onclick="openTask(this)">
                         <span class="task-icon">•</span><span>Bank Accounts</span>
-                        <button class="favorite-star" onclick="toggleFavorite(event,this)" title="Add to Favorites">☆</button>
+                        <button class="favorite-star" onclick="toggleFavorite(event,this)">☆</button>
                     </a>
-                    <a class="task-item" href="modules/bank-reconciliation.html" target="contentFrame"
-                       data-task="Bank Reconciliation" onclick="openTask(this)">
+                    <a class="task-item" href="modules/bank-reconciliation.html" target="contentFrame" data-task="Bank Reconciliation" onclick="openTask(this)">
                         <span class="task-icon">•</span><span>Bank Reconciliation</span>
-                        <button class="favorite-star" onclick="toggleFavorite(event,this)" title="Add to Favorites">☆</button>
+                        <button class="favorite-star" onclick="toggleFavorite(event,this)">☆</button>
                     </a>
                 </div>
             </div>
 
             <div class="menu-group" data-module="Cash">
                 <button class="menu-item" onclick="toggleGroup(this.parentElement)">
-                    <span class="menu-icon">▤</span>
-                    <span>Cash</span>
-                    <span class="menu-arrow">›</span>
+                    <span class="menu-icon">▤</span><span>Cash</span><span class="menu-arrow">›</span>
                 </button>
                 <div class="submenu">
-                    <a class="task-item" href="modules/cash-receipts.html" target="contentFrame"
-                       data-task="Cash Receipts" onclick="openTask(this)">
+                    <a class="task-item" href="modules/cash-receipts.html" target="contentFrame" data-task="Cash Receipts" onclick="openTask(this)">
                         <span class="task-icon">•</span><span>Cash Receipts</span>
                         <button class="favorite-star" onclick="toggleFavorite(event,this)">☆</button>
                     </a>
-                    <a class="task-item" href="modules/cash-disbursements.html" target="contentFrame"
-                       data-task="Cash Disbursements" onclick="openTask(this)">
+                    <a class="task-item" href="modules/cash-disbursements.html" target="contentFrame" data-task="Cash Disbursements" onclick="openTask(this)">
                         <span class="task-icon">•</span><span>Cash Disbursements</span>
                         <button class="favorite-star" onclick="toggleFavorite(event,this)">☆</button>
                     </a>
@@ -469,23 +122,18 @@ body {
 
             <div class="menu-group" data-module="Accounts Receivable">
                 <button class="menu-item" onclick="toggleGroup(this.parentElement)">
-                    <span class="menu-icon">⇧</span>
-                    <span>Accounts Receivable</span>
-                    <span class="menu-arrow">›</span>
+                    <span class="menu-icon">⇧</span><span>Accounts Receivable</span><span class="menu-arrow">›</span>
                 </button>
                 <div class="submenu">
-                    <a class="task-item" href="modules/customers.html" target="contentFrame"
-                       data-task="Customers" onclick="openTask(this)">
+                    <a class="task-item" href="modules/customers.html" target="contentFrame" data-task="Customers" onclick="openTask(this)">
                         <span class="task-icon">•</span><span>Customers</span>
                         <button class="favorite-star" onclick="toggleFavorite(event,this)">☆</button>
                     </a>
-                    <a class="task-item" href="modules/sales-invoices.html" target="contentFrame"
-                       data-task="Sales Invoices" onclick="openTask(this)">
+                    <a class="task-item" href="modules/sales-invoices.html" target="contentFrame" data-task="Sales Invoices" onclick="openTask(this)">
                         <span class="task-icon">•</span><span>Sales Invoices</span>
                         <button class="favorite-star" onclick="toggleFavorite(event,this)">☆</button>
                     </a>
-                    <a class="task-item" href="modules/collections.html" target="contentFrame"
-                       data-task="Collections" onclick="openTask(this)">
+                    <a class="task-item" href="modules/collections.html" target="contentFrame" data-task="Collections" onclick="openTask(this)">
                         <span class="task-icon">•</span><span>Collections</span>
                         <button class="favorite-star" onclick="toggleFavorite(event,this)">☆</button>
                     </a>
@@ -494,23 +142,18 @@ body {
 
             <div class="menu-group" data-module="Accounts Payable">
                 <button class="menu-item" onclick="toggleGroup(this.parentElement)">
-                    <span class="menu-icon">⇩</span>
-                    <span>Accounts Payable</span>
-                    <span class="menu-arrow">›</span>
+                    <span class="menu-icon">⇩</span><span>Accounts Payable</span><span class="menu-arrow">›</span>
                 </button>
                 <div class="submenu">
-                    <a class="task-item" href="modules/vendors.html" target="contentFrame"
-                       data-task="Vendors" onclick="openTask(this)">
+                    <a class="task-item" href="modules/vendors.html" target="contentFrame" data-task="Vendors" onclick="openTask(this)">
                         <span class="task-icon">•</span><span>Vendors</span>
                         <button class="favorite-star" onclick="toggleFavorite(event,this)">☆</button>
                     </a>
-                    <a class="task-item" href="modules/purchase-invoices.html" target="contentFrame"
-                       data-task="Purchase Invoices" onclick="openTask(this)">
+                    <a class="task-item" href="modules/purchase-invoices.html" target="contentFrame" data-task="Purchase Invoices" onclick="openTask(this)">
                         <span class="task-icon">•</span><span>Purchase Invoices</span>
                         <button class="favorite-star" onclick="toggleFavorite(event,this)">☆</button>
                     </a>
-                    <a class="task-item" href="modules/payments.html" target="contentFrame"
-                       data-task="Payments" onclick="openTask(this)">
+                    <a class="task-item" href="modules/payments.html" target="contentFrame" data-task="Payments" onclick="openTask(this)">
                         <span class="task-icon">•</span><span>Payments</span>
                         <button class="favorite-star" onclick="toggleFavorite(event,this)">☆</button>
                     </a>
@@ -519,23 +162,18 @@ body {
 
             <div class="menu-group" data-module="General Ledger">
                 <button class="menu-item" onclick="toggleGroup(this.parentElement)">
-                    <span class="menu-icon">▦</span>
-                    <span>General Ledger</span>
-                    <span class="menu-arrow">›</span>
+                    <span class="menu-icon">▦</span><span>General Ledger</span><span class="menu-arrow">›</span>
                 </button>
                 <div class="submenu">
-                    <a class="task-item" href="modules/chart-of-accounts.html" target="contentFrame"
-                       data-task="Chart of Accounts" onclick="openTask(this)">
+                    <a class="task-item" href="modules/chart-of-accounts.html" target="contentFrame" data-task="Chart of Accounts" onclick="openTask(this)">
                         <span class="task-icon">•</span><span>Chart of Accounts</span>
                         <button class="favorite-star" onclick="toggleFavorite(event,this)">☆</button>
                     </a>
-                    <a class="task-item" href="modules/journal-entry.html" target="contentFrame"
-                       data-task="Journal Entry" onclick="openTask(this)">
+                    <a class="task-item" href="modules/journal-entry.html" target="contentFrame" data-task="Journal Entry" onclick="openTask(this)">
                         <span class="task-icon">•</span><span>Journal Entry</span>
                         <button class="favorite-star" onclick="toggleFavorite(event,this)">☆</button>
                     </a>
-                    <a class="task-item" href="modules/general-ledger.html" target="contentFrame"
-                       data-task="General Ledger" onclick="openTask(this)">
+                    <a class="task-item" href="modules/general-ledger.html" target="contentFrame" data-task="General Ledger" onclick="openTask(this)">
                         <span class="task-icon">•</span><span>General Ledger</span>
                         <button class="favorite-star" onclick="toggleFavorite(event,this)">☆</button>
                     </a>
@@ -544,19 +182,14 @@ body {
 
             <div class="menu-group" data-module="Inventory">
                 <button class="menu-item" onclick="toggleGroup(this.parentElement)">
-                    <span class="menu-icon">▧</span>
-                    <span>Inventory</span>
-                    <span class="menu-arrow">›</span>
+                    <span class="menu-icon">▧</span><span>Inventory</span><span class="menu-arrow">›</span>
                 </button>
                 <div class="submenu">
-                    <a class="task-item" href="modules/items.html" target="contentFrame"
-                       data-task="Items" onclick="openTask(this)">
+                    <a class="task-item" href="modules/items.html" target="contentFrame" data-task="Items" onclick="openTask(this)">
                         <span class="task-icon">•</span><span>Items</span>
                         <button class="favorite-star" onclick="toggleFavorite(event,this)">☆</button>
                     </a>
-                    
-                    <a class="task-item" href="modules/stock-movement.html" target="contentFrame"
-                       data-task="Stock Movement" onclick="openTask(this)">
+                    <a class="task-item" href="modules/stock-movement.html" target="contentFrame" data-task="Stock Movement" onclick="openTask(this)">
                         <span class="task-icon">•</span><span>Stock Movement</span>
                         <button class="favorite-star" onclick="toggleFavorite(event,this)">☆</button>
                     </a>
@@ -565,23 +198,18 @@ body {
 
             <div class="menu-group" data-module="Reports">
                 <button class="menu-item" onclick="toggleGroup(this.parentElement)">
-                    <span class="menu-icon">▥</span>
-                    <span>Reports</span>
-                    <span class="menu-arrow">›</span>
+                    <span class="menu-icon">▥</span><span>Reports</span><span class="menu-arrow">›</span>
                 </button>
                 <div class="submenu">
-                    <a class="task-item" href="reports/trial-balance.html" target="contentFrame"
-                       data-task="Trial Balance" onclick="openTask(this)">
+                    <a class="task-item" href="reports/trial-balance.html" target="contentFrame" data-task="Trial Balance" onclick="openTask(this)">
                         <span class="task-icon">•</span><span>Trial Balance</span>
                         <button class="favorite-star" onclick="toggleFavorite(event,this)">☆</button>
                     </a>
-                    <a class="task-item" href="reports/income-statement.html" target="contentFrame"
-                       data-task="Income Statement" onclick="openTask(this)">
+                    <a class="task-item" href="reports/income-statement.html" target="contentFrame" data-task="Income Statement" onclick="openTask(this)">
                         <span class="task-icon">•</span><span>Income Statement</span>
                         <button class="favorite-star" onclick="toggleFavorite(event,this)">☆</button>
                     </a>
-                    <a class="task-item" href="reports/balance-sheet.html" target="contentFrame"
-                       data-task="Balance Sheet" onclick="openTask(this)">
+                    <a class="task-item" href="reports/balance-sheet.html" target="contentFrame" data-task="Balance Sheet" onclick="openTask(this)">
                         <span class="task-icon">•</span><span>Balance Sheet</span>
                         <button class="favorite-star" onclick="toggleFavorite(event,this)">☆</button>
                     </a>
@@ -592,23 +220,22 @@ body {
 
             <div class="menu-group" data-module="Setup">
                 <button class="menu-item" onclick="toggleGroup(this.parentElement)">
-                    <span class="menu-icon">⚙</span>
-                    <span>Setup</span>
-                    <span class="menu-arrow">›</span>
+                    <span class="menu-icon">⚙</span><span>Setup</span><span class="menu-arrow">›</span>
                 </button>
                 <div class="submenu">
-                    <a class="task-item" href="setup/user-access.html" target="contentFrame"
-                       data-task="User Access" onclick="openTask(this)">
+                    <a class="task-item" href="setup/company-setup.html" target="contentFrame" data-task="Company Setup" onclick="openTask(this)">
+                        <span class="task-icon">•</span><span>Company Setup</span>
+                        <button class="favorite-star" onclick="toggleFavorite(event,this)">☆</button>
+                    </a>
+                    <a class="task-item" href="setup/user-access.html" target="contentFrame" data-task="User Access" onclick="openTask(this)">
                         <span class="task-icon">•</span><span>User Access</span>
                         <button class="favorite-star" onclick="toggleFavorite(event,this)">☆</button>
                     </a>
-                    <a class="task-item" href="setup/user.html" target="contentFrame"
-                       data-task="Create User" onclick="openTask(this)">
+                    <a class="task-item" href="setup/user.html" target="contentFrame" data-task="Create User" onclick="openTask(this)">
                         <span class="task-icon">•</span><span>Create User</span>
                         <button class="favorite-star" onclick="toggleFavorite(event,this)">☆</button>
                     </a>
-                    <a class="task-item" href="setup/user-update.html" target="contentFrame"
-                       data-task="Update User" onclick="openTask(this)">
+                    <a class="task-item" href="setup/user-update.html" target="contentFrame" data-task="Update User" onclick="openTask(this)">
                         <span class="task-icon">•</span><span>Update User</span>
                         <button class="favorite-star" onclick="toggleFavorite(event,this)">☆</button>
                     </a>
@@ -620,10 +247,8 @@ body {
 </aside>
 
 <main class="main">
-
     <header class="header">
         <div class="header-title" id="pageTitle">Dashboard</div>
-
         <div class="header-right">
             <div class="user-info">
                 <div class="user-name" id="userName">User</div>
@@ -634,10 +259,9 @@ body {
         </div>
     </header>
 
-    <section class="content-area" id="contentArea">
+    <section class="content-area">
         <iframe id="contentFrame" name="contentFrame" src="about:blank"></iframe>
     </section>
-
 </main>
 
 <script>
@@ -661,7 +285,7 @@ document.getElementById("userAvatar").textContent =
     .trim().charAt(0).toUpperCase();
 
 function logout() {
-    sessionStorage.removeItem("ACC_SESSION");
+    sessionStorage.removeItem("accsystem_session");
     window.location.href = "login.html";
 }
 
@@ -670,13 +294,11 @@ function toggleGroup(group) {
         ? document.getElementById(group)
         : group;
 
-    if (element) {
-        element.classList.toggle("open");
-    }
+    if (element) element.classList.toggle("open");
 }
 
 function setActive(element, title) {
-    document.querySelectorAll(".task-item, .menu-item").forEach(item => {
+    document.querySelectorAll(".task-item,.menu-item").forEach(item => {
         item.classList.remove("active");
     });
 
@@ -718,16 +340,13 @@ function toggleFavorite(event, button) {
     let favorites = getFavorites();
     const exists = favorites.some(item => item.url === favorite.url);
 
-    if (exists) {
-        favorites = favorites.filter(item => item.url !== favorite.url);
-    } else {
-        favorites.push(favorite);
-    }
+    favorites = exists
+        ? favorites.filter(item => item.url !== favorite.url)
+        : [...favorites, favorite];
 
     saveFavorites(favorites);
     renderFavorites();
 }
-
 
 function renderFavorites() {
     const container = document.getElementById("favoritesList");
@@ -735,7 +354,7 @@ function renderFavorites() {
 
     container.replaceChildren();
 
-    if (favorites.length === 0) {
+    if (!favorites.length) {
         const empty = document.createElement("div");
         empty.className = "favorite-empty";
         empty.textContent = "No favorites yet.";
@@ -763,20 +382,12 @@ function renderFavorites() {
             remove.addEventListener("click", event => {
                 event.preventDefault();
                 event.stopPropagation();
-
-                saveFavorites(
-                    getFavorites().filter(item => item.url !== favorite.url)
-                );
-
+                saveFavorites(getFavorites().filter(item => item.url !== favorite.url));
                 renderFavorites();
             });
 
             link.append(icon, name, remove);
-
-            link.addEventListener("click", () => {
-                setActive(link, favorite.name);
-            });
-
+            link.addEventListener("click", () => setActive(link, favorite.name));
             container.appendChild(link);
         });
     }
@@ -793,40 +404,33 @@ function renderFavorites() {
     });
 }
 
-
-/* PERMISSION FILTER */
 function canView(moduleName) {
     if (userRole.toLowerCase() === "administrator") return true;
 
     return userAccess.some(row =>
         String(row.Module).trim() === moduleName &&
-        (row.CanView === true ||
-         String(row.CanView).toLowerCase() === "true" ||
-         String(row.CanView) === "1")
+        (
+            row.CanView === true ||
+            String(row.CanView).toLowerCase() === "true" ||
+            String(row.CanView) === "1"
+        )
     );
 }
 
 document.querySelectorAll(".menu-group[data-module]").forEach(group => {
-    const moduleName = group.dataset.module;
-
-    if (!canView(moduleName)) {
+    if (!canView(group.dataset.module)) {
         group.style.display = "none";
     }
 });
 
-/* DASHBOARD LINK */
-const dashboardLink = document.querySelector(
-    '.menu-item[href="dashboard.html"]'
-);
+const dashboardLink = document.querySelector('.menu-item[href="dashboard.html"]');
 
 dashboardLink.addEventListener("click", event => {
     event.preventDefault();
-    document.getElementById("pageTitle").textContent = "Dashboard";
     setActive(dashboardLink, "Dashboard");
     showDashboard();
 });
 
-/* DASHBOARD CONTENT */
 function showDashboard() {
     const frame = document.getElementById("contentFrame");
 
@@ -836,45 +440,20 @@ function showDashboard() {
     <head>
     <meta charset="UTF-8">
     <style>
-        * { box-sizing: border-box; }
-        body {
-            margin: 0;
-            padding: 28px;
-            font-family: Arial, sans-serif;
-            background: #f4f6fa;
-            color: #202b3c;
-        }
-        .welcome { margin-bottom: 25px; }
-        h2 { margin: 0 0 7px; font-size: 23px; }
-        p { margin: 0; color: #8993a5; font-size: 13px; }
-        .cards {
-            display: grid;
-            grid-template-columns: repeat(4, minmax(130px, 1fr));
-            gap: 17px;
-        }
-        .card {
-            background: white;
-            border: 1px solid #e8ecf2;
-            border-radius: 10px;
-            padding: 20px;
-        }
-        .label { color: #8993a5; font-size: 12px; }
-        .value { font-size: 25px; font-weight: bold; margin-top: 12px; }
-        .note { color: #9aa3b2; font-size: 11px; margin-top: 7px; }
-        .panel {
-            margin-top: 22px;
-            background: white;
-            border: 1px solid #e8ecf2;
-            border-radius: 10px;
-            padding: 22px;
-        }
-        .panel h3 { margin: 0 0 10px; font-size: 15px; }
-        @media(max-width: 700px) {
-            .cards { grid-template-columns: repeat(2, 1fr); }
-        }
-        @media(max-width: 450px) {
-            .cards { grid-template-columns: 1fr; }
-        }
+        *{box-sizing:border-box}
+        body{margin:0;padding:28px;font-family:Arial,sans-serif;background:#f4f6fa;color:#202b3c}
+        .welcome{margin-bottom:25px}
+        h2{margin:0 0 7px;font-size:23px}
+        p{margin:0;color:#8993a5;font-size:13px}
+        .cards{display:grid;grid-template-columns:repeat(4,minmax(130px,1fr));gap:17px}
+        .card{background:white;border:1px solid #e8ecf2;border-radius:10px;padding:20px}
+        .label{color:#8993a5;font-size:12px}
+        .value{font-size:25px;font-weight:bold;margin-top:12px}
+        .note{color:#9aa3b2;font-size:11px;margin-top:7px}
+        .panel{margin-top:22px;background:white;border:1px solid #e8ecf2;border-radius:10px;padding:22px}
+        .panel h3{margin:0 0 10px;font-size:15px}
+        @media(max-width:700px){.cards{grid-template-columns:repeat(2,1fr)}}
+        @media(max-width:450px){.cards{grid-template-columns:1fr}}
     </style>
     </head>
     <body>
@@ -882,30 +461,12 @@ function showDashboard() {
             <h2>Welcome, ${escapeHtml(currentUser.DisplayName || currentUser.Username || "User")}!</h2>
             <p>Here's your ACC System workspace.</p>
         </div>
-
         <div class="cards">
-            <div class="card">
-                <div class="label">Total Cash</div>
-                <div class="value">₱0.00</div>
-                <div class="note">Cash balance</div>
-            </div>
-            <div class="card">
-                <div class="label">Accounts Receivable</div>
-                <div class="value">₱0.00</div>
-                <div class="note">Outstanding receivables</div>
-            </div>
-            <div class="card">
-                <div class="label">Accounts Payable</div>
-                <div class="value">₱0.00</div>
-                <div class="note">Outstanding payables</div>
-            </div>
-            <div class="card">
-                <div class="label">Net Income</div>
-                <div class="value">₱0.00</div>
-                <div class="note">Current period</div>
-            </div>
+            <div class="card"><div class="label">Total Cash</div><div class="value">₱0.00</div><div class="note">Cash balance</div></div>
+            <div class="card"><div class="label">Accounts Receivable</div><div class="value">₱0.00</div><div class="note">Outstanding receivables</div></div>
+            <div class="card"><div class="label">Accounts Payable</div><div class="value">₱0.00</div><div class="note">Outstanding payables</div></div>
+            <div class="card"><div class="label">Net Income</div><div class="value">₱0.00</div><div class="note">Current period</div></div>
         </div>
-
         <div class="panel">
             <h3>Getting Started</h3>
             <p>Select a module or task from the sidebar to begin.</p>
@@ -916,17 +477,12 @@ function showDashboard() {
 
 function escapeHtml(value) {
     return String(value).replace(/[&<>"']/g, char => ({
-        "&": "&amp;",
-        "<": "&lt;",
-        ">": "&gt;",
-        '"': "&quot;",
-        "'": "&#39;"
+        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
     })[char]);
 }
 
 renderFavorites();
 showDashboard();
 </script>
-
 </body>
 </html>
