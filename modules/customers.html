@@ -1,0 +1,747 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Customer Master | ACC System</title>
+
+<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+
+<style>
+*{box-sizing:border-box}
+body{
+    margin:0;
+    padding:25px;
+    background:#f5f7fb;
+    font-family:Arial,Helvetica,sans-serif;
+    color:#1e293b;
+}
+.header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:15px;
+    margin-bottom:22px;
+}
+.header h2{margin:0;font-size:23px}
+.subtitle{color:#64748b;font-size:13px;margin-top:6px}
+button{
+    border:0;
+    border-radius:6px;
+    padding:10px 15px;
+    cursor:pointer;
+    font-weight:600;
+}
+.primary{background:#2563eb;color:white}
+.primary:hover{background:#1d4ed8}
+.secondary{background:#e2e8f0;color:#334155}
+.danger{background:#fee2e2;color:#b91c1c}
+.success{background:#dcfce7;color:#15803d}
+.card{
+    background:white;
+    border:1px solid #e2e8f0;
+    border-radius:10px;
+    padding:20px;
+    margin-bottom:18px;
+}
+.stats{
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:15px;
+    margin-bottom:18px;
+}
+.stat-label{font-size:12px;color:#64748b}
+.stat-value{font-size:25px;font-weight:700;margin-top:8px}
+.toolbar{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-bottom:15px;
+}
+input,select,textarea{
+    width:100%;
+    padding:10px 11px;
+    border:1px solid #cbd5e1;
+    border-radius:6px;
+    outline:none;
+    font-size:13px;
+    background:white;
+    color:#1e293b;
+}
+input:focus,select:focus,textarea:focus{
+    border-color:#2563eb;
+}
+.search{flex:1;min-width:220px}
+.filter{width:170px}
+.table-wrap{overflow-x:auto}
+table{
+    width:100%;
+    border-collapse:collapse;
+    min-width:850px;
+}
+th,td{
+    padding:12px 10px;
+    border-bottom:1px solid #e2e8f0;
+    text-align:left;
+    font-size:13px;
+}
+th{
+    background:#f8fafc;
+    color:#475569;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.4px;
+}
+tr:hover td{background:#fafcff}
+.badge{
+    display:inline-block;
+    padding:5px 9px;
+    border-radius:20px;
+    font-size:11px;
+    font-weight:700;
+}
+.active{background:#dcfce7;color:#15803d}
+.inactive{background:#fee2e2;color:#b91c1c}
+.action-buttons{display:flex;gap:6px}
+.action-buttons button{padding:7px 10px;font-size:11px}
+.empty{text-align:center;color:#94a3b8;padding:35px}
+.modal{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(15,23,42,.5);
+    z-index:100;
+    padding:20px;
+    overflow-y:auto;
+    align-items:flex-start;
+    justify-content:center;
+}
+.modal.show{display:flex}
+.modal-box{
+    width:100%;
+    max-width:750px;
+    background:white;
+    border-radius:12px;
+    padding:23px;
+    margin:auto;
+}
+.modal-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:20px;
+}
+.modal-header h3{margin:0}
+.close{
+    background:#f1f5f9;
+    font-size:18px;
+    padding:5px 10px;
+}
+.form-grid{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:15px;
+}
+.field label{
+    display:block;
+    font-size:12px;
+    font-weight:700;
+    margin-bottom:7px;
+    color:#475569;
+}
+.full{grid-column:1/-1}
+.modal-footer{
+    display:flex;
+    justify-content:flex-end;
+    gap:10px;
+    margin-top:22px;
+}
+.notice{
+    padding:12px 14px;
+    border-radius:7px;
+    margin-bottom:15px;
+    font-size:13px;
+    display:none;
+}
+.notice.error{display:block;background:#fee2e2;color:#991b1b}
+.notice.info{display:block;background:#dbeafe;color:#1e40af}
+#loading{
+    color:#64748b;
+    font-size:13px;
+    margin-bottom:12px;
+}
+@media(max-width:650px){
+    body{padding:15px}
+    .stats{grid-template-columns:1fr}
+    .form-grid{grid-template-columns:1fr}
+    .full{grid-column:auto}
+    .filter{width:100%}
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+    <div>
+        <h2>Customer Master</h2>
+        <div class="subtitle">Manage customer records and credit information</div>
+    </div>
+    <button class="primary" id="addButton" onclick="openAddModal()">
+        + Add Customer
+    </button>
+</div>
+
+<div id="notice" class="notice"></div>
+<div id="loading">Loading customer database...</div>
+
+<div class="stats">
+    <div class="card">
+        <div class="stat-label">Total Customers</div>
+        <div class="stat-value" id="totalCount">0</div>
+    </div>
+    <div class="card">
+        <div class="stat-label">Active Customers</div>
+        <div class="stat-value" id="activeCount">0</div>
+    </div>
+    <div class="card">
+        <div class="stat-label">Inactive Customers</div>
+        <div class="stat-value" id="inactiveCount">0</div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="toolbar">
+        <input
+            type="text"
+            id="searchInput"
+            class="search"
+            placeholder="Search customer ID, code, name, TIN..."
+            oninput="renderTable()"
+        >
+
+        <select id="statusFilter" class="filter" onchange="renderTable()">
+            <option value="all">All Status</option>
+            <option value="true">Active</option>
+            <option value="false">Inactive</option>
+        </select>
+    </div>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Customer ID</th>
+                    <th>Customer Code</th>
+                    <th>Customer Name</th>
+                    <th>Contact Person</th>
+                    <th>Payment Terms</th>
+                    <th>Credit Limit</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="customerTable">
+                <tr><td colspan="8" class="empty">Loading...</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- CUSTOMER MODAL -->
+<div class="modal" id="customerModal">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h3 id="modalTitle">Add Customer</h3>
+            <button class="close" onclick="closeModal()">×</button>
+        </div>
+
+        <div class="form-grid">
+
+            <div class="field">
+                <label>Customer ID</label>
+                <input id="customerID" readonly>
+            </div>
+
+            <div class="field">
+                <label>Customer Code *</label>
+                <input id="customerCode" maxlength="30" placeholder="e.g. CUST-001">
+            </div>
+
+            <div class="field full">
+                <label>Customer Name *</label>
+                <input id="customerName" maxlength="150" placeholder="Enter customer or company name">
+            </div>
+
+            <div class="field">
+                <label>Contact Person</label>
+                <input id="contactPerson" maxlength="100">
+            </div>
+
+            <div class="field">
+                <label>TIN</label>
+                <input id="tin" maxlength="30">
+            </div>
+
+            <div class="field full">
+                <label>Billing Address</label>
+                <textarea id="billingAddress" rows="2"></textarea>
+            </div>
+
+            <div class="field">
+                <label>Email</label>
+                <input id="email" type="email">
+            </div>
+
+            <div class="field">
+                <label>Phone</label>
+                <input id="phone" maxlength="40">
+            </div>
+
+            <div class="field">
+                <label>Payment Terms</label>
+                <select id="paymentTerms">
+                    <option value="COD">COD</option>
+                    <option value="Due on Receipt">Due on Receipt</option>
+                    <option value="Net 7">Net 7</option>
+                    <option value="Net 15">Net 15</option>
+                    <option value="Net 30" selected>Net 30</option>
+                    <option value="Net 45">Net 45</option>
+                    <option value="Net 60">Net 60</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label>Credit Limit (PHP)</label>
+                <input id="creditLimit" type="number" min="0" step="0.01" value="0">
+            </div>
+
+            <div class="field">
+                <label>Account Status</label>
+                <select id="isActive">
+                    <option value="true">Active</option>
+                    <option value="false">Inactive</option>
+                </select>
+            </div>
+
+        </div>
+
+        <div class="modal-footer">
+            <button class="secondary" onclick="closeModal()">Cancel</button>
+            <button class="primary" id="saveButton" onclick="saveCustomer()">Save Customer</button>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+import {
+    readExcel,
+    getSheet,
+    addRecord,
+    updateRecord,
+    saveExcel
+} from "../excel.js";
+
+let customers = [];
+let currentSession = null;
+let editingID = null;
+let canCreate = false;
+let canEdit = false;
+let canDelete = false;
+
+const $ = id => document.getElementById(id);
+
+function showNotice(message,type="info"){
+    const notice=$("notice");
+    notice.textContent=message;
+    notice.className="notice "+type;
+    window.scrollTo({top:0,behavior:"smooth"});
+}
+
+function hideNotice(){
+    $("notice").className="notice";
+}
+
+function isTrue(value){
+    return value===true ||
+        String(value).toLowerCase()==="true" ||
+        String(value)==="1";
+}
+
+function checkSession(){
+    const raw=sessionStorage.getItem("accsystem_session");
+
+    if(!raw){
+        window.top.location.href="../login.html";
+        return false;
+    }
+
+    try{
+        currentSession=JSON.parse(raw);
+    }catch(error){
+        window.top.location.href="../login.html";
+        return false;
+    }
+
+    const isAdmin=currentSession.Role==="Administrator";
+    const access=Array.isArray(currentSession.Access)
+        ? currentSession.Access
+        : [];
+
+    const permission=access.find(item =>
+        item.Module==="Accounts Receivable" &&
+        (!item.Page || item.Page==="Customers" || item.Page==="Customer Master")
+    );
+
+    canCreate=isAdmin || (permission && isTrue(permission.CanCreate));
+    canEdit=isAdmin || (permission && isTrue(permission.CanEdit));
+    canDelete=isAdmin || (permission && isTrue(permission.CanDelete));
+
+    if(!isAdmin && !permission){
+        document.body.innerHTML=`
+            <div style="padding:40px;font-family:Arial">
+                <h2>Access Denied</h2>
+                <p>You do not have access to Customer Master.</p>
+            </div>`;
+        return false;
+    }
+
+    $("addButton").style.display=canCreate?"inline-block":"none";
+
+    return true;
+}
+
+function normalizeCustomers(){
+    const data=getSheet("Customers");
+    customers=Array.isArray(data)?data:[];
+}
+
+function generateCustomerID(){
+    let highest=0;
+
+    customers.forEach(customer=>{
+        const id=String(customer.CustomerID||"");
+        const match=id.match(/^CU(\d+)$/i);
+
+        if(match){
+            highest=Math.max(highest,Number(match[1]));
+        }
+    });
+
+    return "CU"+String(highest+1).padStart(4,"0");
+}
+
+function formatMoney(value){
+    return new Intl.NumberFormat("en-PH",{
+        style:"currency",
+        currency:"PHP",
+        minimumFractionDigits:2
+    }).format(Number(value)||0);
+}
+
+function escapeHTML(value){
+    return String(value??"").replace(/[&<>"']/g,char=>({
+        "&":"&amp;",
+        "<":"&lt;",
+        ">":"&gt;",
+        '"':"&quot;",
+        "'":"&#39;"
+    }[char]));
+}
+
+function updateStats(){
+    const active=customers.filter(c=>isTrue(c.IsActive)).length;
+
+    $("totalCount").textContent=customers.length;
+    $("activeCount").textContent=active;
+    $("inactiveCount").textContent=customers.length-active;
+}
+
+function renderTable(){
+    const search=$("searchInput").value.trim().toLowerCase();
+    const status=$("statusFilter").value;
+
+    let filtered=customers.filter(customer=>{
+        const searchable=[
+            customer.CustomerID,
+            customer.CustomerCode,
+            customer.CustomerName,
+            customer.ContactPerson,
+            customer.TIN,
+            customer.Email,
+            customer.Phone
+        ].join(" ").toLowerCase();
+
+        const matchesSearch=searchable.includes(search);
+        const active=isTrue(customer.IsActive);
+
+        const matchesStatus=status==="all" ||
+            (status==="true" && active) ||
+            (status==="false" && !active);
+
+        return matchesSearch && matchesStatus;
+    });
+
+    filtered.sort((a,b)=>
+        String(a.CustomerName||"").localeCompare(String(b.CustomerName||""))
+    );
+
+    const tbody=$("customerTable");
+
+    if(!filtered.length){
+        tbody.innerHTML=`
+            <tr>
+                <td colspan="8" class="empty">No customer records found.</td>
+            </tr>`;
+        updateStats();
+        return;
+    }
+
+    tbody.innerHTML=filtered.map(customer=>{
+        const active=isTrue(customer.IsActive);
+
+        let actions="";
+
+        if(canEdit){
+            actions+=`
+                <button class="secondary"
+                    onclick="editCustomer('${escapeHTML(customer.CustomerID)}')">
+                    Edit
+                </button>`;
+        }
+
+        if(canDelete){
+            actions+=`
+                <button class="${active?"danger":"success"}"
+                    onclick="toggleCustomer('${escapeHTML(customer.CustomerID)}')">
+                    ${active?"Deactivate":"Activate"}
+                </button>`;
+        }
+
+        return `
+            <tr>
+                <td>${escapeHTML(customer.CustomerID)}</td>
+                <td>${escapeHTML(customer.CustomerCode)}</td>
+                <td><strong>${escapeHTML(customer.CustomerName)}</strong></td>
+                <td>${escapeHTML(customer.ContactPerson||"-")}</td>
+                <td>${escapeHTML(customer.PaymentTerms||"-")}</td>
+                <td>${formatMoney(customer.CreditLimit)}</td>
+                <td>
+                    <span class="badge ${active?"active":"inactive"}">
+                        ${active?"Active":"Inactive"}
+                    </span>
+                </td>
+                <td>
+                    <div class="action-buttons">${actions||"-"}</div>
+                </td>
+            </tr>`;
+    }).join("");
+
+    updateStats();
+}
+
+function clearForm(){
+    [
+        "customerCode","customerName","contactPerson","tin",
+        "billingAddress","email","phone"
+    ].forEach(id=>$(id).value="");
+
+    $("paymentTerms").value="Net 30";
+    $("creditLimit").value="0";
+    $("isActive").value="true";
+}
+
+window.openAddModal=function(){
+    if(!canCreate){
+        showNotice("You do not have permission to create customers.","error");
+        return;
+    }
+
+    editingID=null;
+    clearForm();
+
+    $("modalTitle").textContent="Add Customer";
+    $("customerID").value=generateCustomerID();
+    $("saveButton").textContent="Save Customer";
+    $("customerModal").classList.add("show");
+};
+
+window.editCustomer=function(id){
+    if(!canEdit)return;
+
+    const customer=customers.find(c=>String(c.CustomerID)===String(id));
+    if(!customer)return;
+
+    editingID=id;
+
+    $("modalTitle").textContent="Edit Customer";
+    $("customerID").value=customer.CustomerID||"";
+    $("customerCode").value=customer.CustomerCode||"";
+    $("customerName").value=customer.CustomerName||"";
+    $("contactPerson").value=customer.ContactPerson||"";
+    $("tin").value=customer.TIN||"";
+    $("billingAddress").value=customer.BillingAddress||"";
+    $("email").value=customer.Email||"";
+    $("phone").value=customer.Phone||"";
+    $("paymentTerms").value=customer.PaymentTerms||"Net 30";
+    $("creditLimit").value=Number(customer.CreditLimit)||0;
+    $("isActive").value=isTrue(customer.IsActive)?"true":"false";
+
+    $("saveButton").textContent="Update Customer";
+    $("customerModal").classList.add("show");
+};
+
+window.closeModal=function(){
+    $("customerModal").classList.remove("show");
+};
+
+window.saveCustomer=async function(){
+    hideNotice();
+
+    const code=$("customerCode").value.trim();
+    const name=$("customerName").value.trim();
+    const creditLimit=Number($("creditLimit").value);
+
+    if(!code || !name){
+        showNotice("Customer Code and Customer Name are required.","error");
+        return;
+    }
+
+    if(!Number.isFinite(creditLimit)||creditLimit<0){
+        showNotice("Please enter a valid non-negative credit limit.","error");
+        return;
+    }
+
+    const duplicate=customers.find(c=>
+        String(c.CustomerCode||"").toLowerCase()===code.toLowerCase() &&
+        String(c.CustomerID)!==String(editingID)
+    );
+
+    if(duplicate){
+        showNotice("Customer Code already exists.","error");
+        return;
+    }
+
+    const now=new Date().toISOString();
+
+    const record={
+        CustomerID:$("customerID").value,
+        CustomerCode:code,
+        CustomerName:name,
+        ContactPerson:$("contactPerson").value.trim(),
+        TIN:$("tin").value.trim(),
+        BillingAddress:$("billingAddress").value.trim(),
+        Email:$("email").value.trim(),
+        Phone:$("phone").value.trim(),
+        PaymentTerms:$("paymentTerms").value,
+        CreditLimit:creditLimit,
+        IsActive:$("isActive").value==="true",
+        CreatedAt:editingID
+            ? customers.find(c=>String(c.CustomerID)===String(editingID))?.CreatedAt||now
+            : now,
+        UpdatedAt:now
+    };
+
+    const saveButton=$("saveButton");
+    saveButton.disabled=true;
+    saveButton.textContent="Saving...";
+
+    try{
+        if(editingID){
+            if(!canEdit)throw new Error("You do not have permission to edit customers.");
+
+            await updateRecord(
+                "Customers",
+                "CustomerID",
+                editingID,
+                record
+            );
+        }else{
+            if(!canCreate)throw new Error("You do not have permission to create customers.");
+
+            await addRecord("Customers",record);
+        }
+
+        await saveExcel();
+
+        normalizeCustomers();
+        renderTable();
+        closeModal();
+
+        showNotice(
+            editingID
+                ?"Customer updated successfully."
+                :"Customer created successfully.",
+            "info"
+        );
+
+    }catch(error){
+        console.error(error);
+        showNotice("Unable to save customer: "+error.message,"error");
+    }finally{
+        saveButton.disabled=false;
+        saveButton.textContent=editingID?"Update Customer":"Save Customer";
+    }
+};
+
+window.toggleCustomer=async function(id){
+    if(!canDelete)return;
+
+    const customer=customers.find(c=>String(c.CustomerID)===String(id));
+    if(!customer)return;
+
+    const currentlyActive=isTrue(customer.IsActive);
+    const action=currentlyActive?"deactivate":"activate";
+
+    if(!confirm(`Are you sure you want to ${action} ${customer.CustomerName}?`)){
+        return;
+    }
+
+    try{
+        await updateRecord(
+            "Customers",
+            "CustomerID",
+            id,
+            {
+                IsActive:!currentlyActive,
+                UpdatedAt:new Date().toISOString()
+            }
+        );
+
+        await saveExcel();
+
+        normalizeCustomers();
+        renderTable();
+
+        showNotice(`Customer ${action}d successfully.`,"info");
+
+    }catch(error){
+        console.error(error);
+        showNotice("Unable to update customer: "+error.message,"error");
+    }
+};
+
+async function initialize(){
+    try{
+        if(!checkSession())return;
+
+        await readExcel();
+        normalizeCustomers();
+
+        $("loading").style.display="none";
+        renderTable();
+
+    }catch(error){
+        console.error(error);
+        $("loading").textContent="Unable to load customer database: "+error.message;
+        showNotice("Database loading failed. Please refresh the page.","error");
+    }
+}
+
+initialize();
+</script>
+
+</body>
+</html>
