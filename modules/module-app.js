@@ -93,6 +93,37 @@ function message(t, bad = false) {
 }
 
 // ==========================================
+// DUPLICATE VALIDATION
+// ==========================================
+
+function checkDuplicates(record) {
+  const uniqueFields = cfg.uniqueFields || [];
+
+  for (const field of uniqueFields) {
+    const value = String(record[field] ?? "")
+      .trim()
+      .toLowerCase();
+
+    if (!value) continue;
+
+    const duplicate = data.some(row =>
+      String(row[field] ?? "")
+        .trim()
+        .toLowerCase() === value
+    );
+
+    if (duplicate) {
+      const fieldConfig = cfg.fields.find(f => f.name === field);
+      const label = fieldConfig?.label || field;
+
+      throw new Error(
+        `${label} already exists. Duplicate records are not allowed.`
+      );
+    }
+  }
+}
+
+// ==========================================
 // SELECT OPTIONS
 // ==========================================
 
@@ -203,7 +234,7 @@ function render() {
 }
 
 // ==========================================
-// LOAD DATABASE WITH DIAGNOSTICS
+// LOAD DATABASE
 // ==========================================
 
 async function load() {
@@ -224,14 +255,12 @@ async function load() {
 
     console.log("WORKBOOK SHEETS:", result);
 
-    console.log("STEP 3: Checking database status...");
+    console.log("STEP 3: Loading module sheet...");
 
-    const records = getSheet(cfg.sheet);
+    data = getSheet(cfg.sheet);
 
-    console.log("CURRENT MODULE SHEET:", cfg.sheet);
-    console.log("RECORD COUNT:", records.length);
-
-    data = records;
+    console.log("MODULE SHEET:", cfg.sheet);
+    console.log("RECORD COUNT:", data.length);
 
     render();
 
@@ -241,7 +270,6 @@ async function load() {
 
   } catch (e) {
     console.error("DATABASE LOAD ERROR:", e);
-
     message("Database error: " + e.message, true);
   }
 }
@@ -253,12 +281,14 @@ async function load() {
 $("form").addEventListener("submit", async e => {
   e.preventDefault();
 
+  const saveButton = $("save");
+
   try {
     if (!allowed("CanCreate")) {
       throw new Error("No create permission");
     }
 
-    console.log("SAVE: Checking database...");
+    saveButton.disabled = true;
 
     const fd = new FormData(e.target);
     const rec = {};
@@ -272,6 +302,9 @@ $("form").addEventListener("submit", async e => {
         rec[f.name] = n(rec[f.name]);
       }
     });
+
+    // CHECK DUPLICATE RECORDS BEFORE SAVING
+    checkDuplicates(rec);
 
     const t = now();
 
@@ -306,19 +339,13 @@ $("form").addEventListener("submit", async e => {
 
     console.log("SAVE: Record prepared:", rec);
 
-    console.log("SAVE: Adding record to sheet:", cfg.sheet);
-
     addRecord(cfg.sheet, rec);
 
     if (cfg.afterSave) {
       await cfg.afterSave(rec);
     }
 
-    console.log("SAVE: Uploading Excel database...");
-
     await saveExcel();
-
-    console.log("SAVE: Successful.");
 
     data = getSheet(cfg.sheet);
 
@@ -330,8 +357,10 @@ $("form").addEventListener("submit", async e => {
 
   } catch (err) {
     console.error("SAVE ERROR:", err);
-
     message(err.message, true);
+
+  } finally {
+    saveButton.disabled = !allowed("CanCreate");
   }
 });
 
@@ -399,6 +428,33 @@ $("tableBody").addEventListener("click", async e => {
     }
 
     try {
+      // CHECK DUPLICATES AGAINST OTHER RECORDS
+      const uniqueFields = cfg.uniqueFields || [];
+
+      for (const field of uniqueFields) {
+        const value = String(changes[field] ?? "")
+          .trim()
+          .toLowerCase();
+
+        if (!value) continue;
+
+        const duplicate = data.some(row =>
+          String(row[field] ?? "")
+            .trim()
+            .toLowerCase() === value &&
+          String(row[cfg.key]) !== String(r[cfg.key])
+        );
+
+        if (duplicate) {
+          const fieldConfig = cfg.fields.find(f => f.name === field);
+          const label = fieldConfig?.label || field;
+
+          throw new Error(
+            `${label} already exists. Duplicate records are not allowed.`
+          );
+        }
+      }
+
       updateRecord(
         cfg.sheet,
         cfg.key,
