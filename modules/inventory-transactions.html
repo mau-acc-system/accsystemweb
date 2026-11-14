@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -122,90 +123,277 @@ td.num,th.num{text-align:right}
 import { validateLicense, readExcel, getSheet, addRecord, saveExcel } from "../excel.js";
 
 const $ = id => document.getElementById(id);
-let items = [], transactions = [], session = null, canCreate = false;
-const today = new Date();
-$("transactionDate").value = new Date(today.getTime()-today.getTimezoneOffset()*60000).toISOString().slice(0,10);
+let items = [], transactions = [], session = null, canCreate = false, pageReady = false;
 
-function showError(message, target="errorBox"){const el=$(target);el.textContent=message;el.style.display="block";}
-function clearMessages(){["errorBox","successBox","formError"].forEach(id=>{$(id).style.display="none";$(id).textContent="";});}
-function num(v){const n=Number(v);return Number.isFinite(n)?n:0;}
-function fmt(v){return num(v).toLocaleString(undefined,{maximumFractionDigits:4});}
-function dateOnly(v){if(!v)return "";if(typeof v==="number"){const d=new Date((v-25569)*86400000);return isNaN(d)?"":d.toISOString().slice(0,10);}return String(v).slice(0,10);}
-function active(v){return v===true||v===1||String(v).toLowerCase()==="true"||String(v)==="1"||String(v).toLowerCase()==="yes";}
-function getItem(id){return items.find(x=>String(x.ItemID)===String(id));}
-function stockFor(id){return transactions.reduce((sum,t)=>sum+(String(t.ItemID)===String(id)?num(t.QuantityIn)-num(t.QuantityOut):0),0);}
-function typeDirection(type){return ["Beginning Balance","Stock In","Adjustment In"].includes(type)?"in":"out";}
-function makeId(prefix,rows,key){let max=0;rows.forEach(r=>{const m=String(r[key]||"").match(/(\d+)$/);if(m)max=Math.max(max,Number(m[1]));});return prefix+String(max+1).padStart(4,"0");}
-function makeTransactionNo(){let max=0;transactions.forEach(t=>{const m=String(t.TransactionNo||"").match(/(\d+)$/);if(m)max=Math.max(max,Number(m[1]));});return "ITR-"+String(max+1).padStart(6,"0");}
+function showError(message, target="errorBox"){
+ const el=$(target);
+ el.textContent=message;
+ el.style.display="block";
+}
+function clearMessages(){
+ ["errorBox","successBox","formError"].forEach(id=>{
+  $(id).style.display="none";
+  $(id).textContent="";
+ });
+}
+function num(v){
+ const n=Number(v);
+ return Number.isFinite(n)?n:0;
+}
+function fmt(v){
+ return num(v).toLocaleString(undefined,{maximumFractionDigits:4});
+}
+function dateOnly(v){
+ if(!v)return "";
+ if(typeof v==="number"){
+  const d=new Date((v-25569)*86400000);
+  return isNaN(d)?"":d.toISOString().slice(0,10);
+ }
+ return String(v).slice(0,10);
+}
+function active(v){
+ return v===true||v===1||String(v).toLowerCase()==="true"||String(v)==="1"||String(v).toLowerCase()==="yes";
+}
+function getItem(id){
+ return items.find(x=>String(x.ItemID)===String(id));
+}
+function stockFor(id){
+ return transactions.reduce((sum,t)=>sum+(String(t.ItemID)===String(id)?num(t.QuantityIn)-num(t.QuantityOut):0),0);
+}
+function typeDirection(type){
+ return ["Beginning Balance","Stock In","Adjustment In"].includes(type)?"in":"out";
+}
+function makeId(prefix,rows,key){
+ let max=0;
+ rows.forEach(r=>{
+  const m=String(r[key]||"").match(/(\d+)$/);
+  if(m)max=Math.max(max,Number(m[1]));
+ });
+ return prefix+String(max+1).padStart(4,"0");
+}
+function makeTransactionNo(){
+ let max=0;
+ transactions.forEach(t=>{
+  const m=String(t.TransactionNo||"").match(/(\d+)$/);
+  if(m)max=Math.max(max,Number(m[1]));
+ });
+ return "ITR-"+String(max+1).padStart(6,"0");
+}
 
 async function init(){
  try{
   if(!await validateLicense()) throw new Error("License validation failed. Please check your system license.");
   await readExcel();
+
   session=JSON.parse(sessionStorage.getItem("accsystem_session")||"null");
   if(!session) throw new Error("Session not found. Please log in again.");
-  const role=String(session.Role||"").toLowerCase();
+
+  const role=String(session.Role||"").trim().toLowerCase();
   const access=Array.isArray(session.Access)?session.Access:[];
-  const permission=access.find(x=>String(x.Module||"").toLowerCase()==="inventory");
-  canCreate=role==="administrator" || !!(permission && active(permission.CanCreate));
-  if(!canCreate) $("addBtn").disabled=true;
+  const permission=access.find(x=>
+   String(x.Module||x.ModuleName||"").trim().toLowerCase()==="inventory"
+  );
+
+  canCreate =
+   role==="administrator" ||
+   role==="admin" ||
+   !!(permission && active(permission.CanCreate));
+
+  pageReady=true;
+
   const itemSheet=getSheet("Items")||[];
   const txSheet=getSheet("InventoryTransactions")||[];
-  items=itemSheet.filter(x=>active(x.IsActive)&&String(x.ItemType||"").toLowerCase()==="inventory");
+
+  items=itemSheet.filter(x=>
+   active(x.IsActive)&&String(x.ItemType||"").toLowerCase()==="inventory"
+  );
   transactions=txSheet.slice();
+
   fillItemOptions();
   render();
- }catch(e){showError(e.message||"Unable to load inventory records.");$("transactionRows").innerHTML='<tr><td colspan="9" class="empty">Unable to load records.</td></tr>';}
+
+ }catch(e){
+  showError(e.message||"Unable to load inventory records.");
+  $("transactionRows").innerHTML='<tr><td colspan="9" class="empty">Unable to load records.</td></tr>';
+ }
 }
+
 function fillItemOptions(){
  const select=$("itemSelect");
  select.innerHTML='<option value="">Select item</option>';
- items.forEach(item=>{const opt=document.createElement("option");opt.value=item.ItemID;opt.textContent=`${item.ItemCode||item.ItemID} - ${item.ItemName||""}`;select.appendChild(opt);});
- if(!items.length) $("stockHint").textContent="No active Inventory-type items found. Add an Inventory item in Item Master first.";
+
+ items.forEach(item=>{
+  const opt=document.createElement("option");
+  opt.value=item.ItemID;
+  opt.textContent=`${item.ItemCode||item.ItemID} - ${item.ItemName||""}`;
+  select.appendChild(opt);
+ });
+
+ if(!items.length){
+  $("stockHint").textContent="No active Inventory-type items found. Add an Inventory item in Item Master first.";
+ }
 }
+
 function render(){
- const query=$("searchInput").value.trim().toLowerCase(), type=$("typeFilter").value, date=$("dateFilter").value;
+ const query=$("searchInput").value.trim().toLowerCase();
+ const type=$("typeFilter").value;
+ const date=$("dateFilter").value;
+
  const filtered=transactions.filter(t=>{
   const item=getItem(t.ItemID)||{};
-  const hay=[t.TransactionNo,t.ItemID,item.ItemCode,item.ItemName,t.ReferenceType,t.ReferenceID,t.Warehouse,t.Memo].join(" ").toLowerCase();
-  return (!query||hay.includes(query))&&(!type||t.TransactionType===type)&&(!date||dateOnly(t.TransactionDate)===date);
- }).sort((a,b)=>dateOnly(b.TransactionDate).localeCompare(dateOnly(a.TransactionDate))||String(b.TransactionNo||"").localeCompare(String(a.TransactionNo||"")));
+  const hay=[
+   t.TransactionNo,t.ItemID,item.ItemCode,item.ItemName,
+   t.ReferenceType,t.ReferenceID,t.Warehouse,t.Memo
+  ].join(" ").toLowerCase();
+
+  return (!query||hay.includes(query))&&
+   (!type||t.TransactionType===type)&&
+   (!date||dateOnly(t.TransactionDate)===date);
+
+ }).sort((a,b)=>
+  dateOnly(b.TransactionDate).localeCompare(dateOnly(a.TransactionDate))||
+  String(b.TransactionNo||"").localeCompare(String(a.TransactionNo||""))
+ );
+
  $("transactionRows").innerHTML="";
- if(!filtered.length){$("transactionRows").innerHTML='<tr><td colspan="9" class="empty">No inventory transactions found.</td></tr>';}
+
+ if(!filtered.length){
+  $("transactionRows").innerHTML='<tr><td colspan="9" class="empty">No inventory transactions found.</td></tr>';
+ }
+
  filtered.forEach(t=>{
   const item=getItem(t.ItemID)||{};
   const tr=document.createElement("tr");
-  const vals=[t.TransactionNo||"",dateOnly(t.TransactionDate),`${item.ItemCode||t.ItemID||""} - ${item.ItemName||"Unknown item"}`,t.TransactionType||"",fmt(t.QuantityIn),fmt(t.QuantityOut),fmt(t.UnitCost),[t.ReferenceType,t.ReferenceID].filter(Boolean).join(" / "),t.Warehouse||""];
-  vals.forEach((v,i)=>{const td=document.createElement("td");td.textContent=v;if(i===4){td.className="num in";}if(i===5){td.className="num out";}if(i===6)td.className="num";if(i===3){const span=document.createElement("span");span.className="pill";span.textContent=v;td.textContent="";td.appendChild(span);}tr.appendChild(td);});
+
+  const vals=[
+   t.TransactionNo||"",
+   dateOnly(t.TransactionDate),
+   `${item.ItemCode||t.ItemID||""} - ${item.ItemName||"Unknown item"}`,
+   t.TransactionType||"",
+   fmt(t.QuantityIn),
+   fmt(t.QuantityOut),
+   fmt(t.UnitCost),
+   [t.ReferenceType,t.ReferenceID].filter(Boolean).join(" / "),
+   t.Warehouse||""
+  ];
+
+  vals.forEach((v,i)=>{
+   const td=document.createElement("td");
+   td.textContent=v;
+
+   if(i===4)td.className="num in";
+   if(i===5)td.className="num out";
+   if(i===6)td.className="num";
+
+   if(i===3){
+    const span=document.createElement("span");
+    span.className="pill";
+    span.textContent=v;
+    td.textContent="";
+    td.appendChild(span);
+   }
+
+   tr.appendChild(td);
+  });
+
   $("transactionRows").appendChild(tr);
  });
+
  $("itemCount").textContent=items.length.toLocaleString();
  $("totalOnHand").textContent=fmt(items.reduce((s,i)=>s+stockFor(i.ItemID),0));
  $("transactionCount").textContent=transactions.length.toLocaleString();
 }
-function openModal(){clearMessages();$("transactionForm").reset();$("transactionDate").value=new Date(Date.now()-new Date().getTimezoneOffset()*60000).toISOString().slice(0,10);$("unitCost").value="0";$("stockHint").textContent="Select an item to view current stock."; $("modalBackdrop").style.display="flex";}
-function closeModal(){$("modalBackdrop").style.display="none";}
-$("addBtn").addEventListener("click",()=>{if(canCreate)openModal();});
+
+function openModal(){
+ clearMessages();
+ $("transactionForm").reset();
+
+ $("transactionDate").value=
+  new Date(Date.now()-new Date().getTimezoneOffset()*60000).toISOString().slice(0,10);
+
+ $("unitCost").value="0";
+
+ $("stockHint").textContent=items.length
+  ?"Select an item to view current stock."
+  :"No active Inventory-type items found. Add an Inventory item in Item Master first.";
+
+ $("modalBackdrop").style.display="flex";
+}
+
+function closeModal(){
+ $("modalBackdrop").style.display="none";
+}
+
+$("addBtn").addEventListener("click",()=>{
+ clearMessages();
+
+ if(!pageReady){
+  showError("The page is still loading or could not connect to the database. Refresh the page and check the error message.");
+  return;
+ }
+
+ if(!canCreate){
+  showError("Your account does not have Create permission for the Inventory module. Ask the Administrator to enable CanCreate in User Access.");
+  return;
+ }
+
+ openModal();
+});
+
 $("cancelBtn").addEventListener("click",closeModal);
-$("modalBackdrop").addEventListener("click",e=>{if(e.target===$("modalBackdrop"))closeModal();});
+
+$("modalBackdrop").addEventListener("click",e=>{
+ if(e.target===$("modalBackdrop"))closeModal();
+});
+
 $("searchInput").addEventListener("input",render);
 $("typeFilter").addEventListener("change",render);
 $("dateFilter").addEventListener("change",render);
-$("itemSelect").addEventListener("change",()=>{const item=getItem($("itemSelect").value);$("stockHint").textContent=item?`Current on-hand: ${fmt(stockFor(item.ItemID))} ${item.UnitOfMeasure||"units"}`:"Select an item to view current stock.");});
-$("transactionType").addEventListener("change",()=>{const type=$("transactionType").value;$("referenceType").value=type==="Beginning Balance"?"Opening Balance":type.startsWith("Adjustment")?"Adjustment":type==="Stock In"?"Purchase":type==="Stock Out"?"Sales":"Manual";});
+
+$("itemSelect").addEventListener("change",()=>{
+ const item=getItem($("itemSelect").value);
+ $("stockHint").textContent=item
+  ?`Current on-hand: ${fmt(stockFor(item.ItemID))} ${item.UnitOfMeasure||"units"}`
+  :"Select an item to view current stock.";
+});
+
+$("transactionType").addEventListener("change",()=>{
+ const type=$("transactionType").value;
+
+ $("referenceType").value=
+  type==="Beginning Balance"?"Opening Balance":
+  type.startsWith("Adjustment")?"Adjustment":
+  type==="Stock In"?"Purchase":
+  type==="Stock Out"?"Sales":"Manual";
+});
 
 $("transactionForm").addEventListener("submit",async e=>{
- e.preventDefault();clearMessages();
+ e.preventDefault();
+ clearMessages();
+
  try{
-  if(!canCreate)throw new Error("You do not have permission to create inventory transactions.");
-  const item=getItem($("itemSelect").value), type=$("transactionType").value;
-  const qty=num($("quantity").value), cost=num($("unitCost").value);
+  if(!canCreate){
+   throw new Error("You do not have permission to create inventory transactions.");
+  }
+
+  const item=getItem($("itemSelect").value);
+  const type=$("transactionType").value;
+  const qty=num($("quantity").value);
+  const cost=num($("unitCost").value);
+
   if(!item)throw new Error("Please select a valid active Inventory item.");
   if(!(qty>0))throw new Error("Quantity must be greater than zero.");
   if(cost<0)throw new Error("Unit Cost cannot be negative.");
-  const current=stockFor(item.ItemID), incoming=typeDirection(type)==="in";
-  if(!incoming&&qty>current)throw new Error(`Insufficient stock. Current on-hand is ${fmt(current)} ${item.UnitOfMeasure||"units"}.`);
+
+  const current=stockFor(item.ItemID);
+  const incoming=typeDirection(type)==="in";
+
+  if(!incoming&&qty>current){
+   throw new Error(`Insufficient stock. Current on-hand is ${fmt(current)} ${item.UnitOfMeasure||"units"}.`);
+  }
+
   const now=new Date().toISOString();
+
   const record={
    TransactionID:makeId("IT",transactions,"TransactionID"),
    TransactionNo:makeTransactionNo(),
@@ -222,15 +410,28 @@ $("transactionForm").addEventListener("submit",async e=>{
    CreatedAt:now,
    CreatedBy:session.DisplayName||session.Username||""
   };
-  $("saveBtn").disabled=true;$("saveBtn").textContent="Saving...";
+
+  $("saveBtn").disabled=true;
+  $("saveBtn").textContent="Saving...";
+
   await addRecord("InventoryTransactions",record);
   await saveExcel();
+
   transactions.push(record);
-  render();closeModal();
-  $("successBox").textContent=`${record.TransactionNo} saved successfully.`;$("successBox").style.display="block";
- }catch(err){showError(err.message||"Unable to save transaction.","formError");}
- finally{$("saveBtn").disabled=false;$("saveBtn").textContent="Save Transaction";}
+  render();
+  closeModal();
+
+  $("successBox").textContent=`${record.TransactionNo} saved successfully.`;
+  $("successBox").style.display="block";
+
+ }catch(err){
+  showError(err.message||"Unable to save transaction.","formError");
+ }finally{
+  $("saveBtn").disabled=false;
+  $("saveBtn").textContent="Save Transaction";
+ }
 });
+
 init();
 </script>
 </body>
