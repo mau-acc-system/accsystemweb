@@ -721,29 +721,39 @@ function toggleFavorite(event, button) {
     renderFavorites();
 }
 
+
 function renderFavorites() {
     const container = document.getElementById("favoritesList");
     const favorites = getFavorites();
 
-    container.innerHTML = "";
+    container.replaceChildren();
 
     if (favorites.length === 0) {
-        container.innerHTML = '<div class="favorite-empty">No favorites yet.</div>';
+        const empty = document.createElement("div");
+        empty.className = "favorite-empty";
+        empty.textContent = "No favorites yet.";
+        container.appendChild(empty);
     } else {
         favorites.forEach(favorite => {
             const link = document.createElement("a");
             link.className = "task-item";
             link.href = favorite.url;
             link.target = "contentFrame";
-            link.innerHTML = `
-                <span class="task-icon">★</span>
-                <span></span>
-                <button class="favorite-star" title="Remove favorite">★</button>
-            `;
 
-            link.querySelector("span:nth-child(2)").textContent = favorite.name;
+            const icon = document.createElement("span");
+            icon.className = "task-icon";
+            icon.textContent = "★";
 
-            link.querySelector("button").addEventListener("click", event => {
+            const name = document.createElement("span");
+            name.textContent = favorite.name;
+
+            const remove = document.createElement("button");
+            remove.type = "button";
+            remove.className = "favorite-star";
+            remove.textContent = "★";
+            remove.title = "Remove favorite";
+
+            remove.addEventListener("click", event => {
                 event.preventDefault();
                 event.stopPropagation();
 
@@ -753,6 +763,8 @@ function renderFavorites() {
 
                 renderFavorites();
             });
+
+            link.append(icon, name, remove);
 
             link.addEventListener("click", () => {
                 setActive(link, favorite.name);
@@ -766,10 +778,14 @@ function renderFavorites() {
         const button = link.querySelector(".favorite-star");
         if (!button) return;
 
-        const isFavorite = favorites.some(item => item.url === link.getAttribute("href"));
+        const isFavorite = favorites.some(
+            item => item.url === link.getAttribute("href")
+        );
+
         button.textContent = isFavorite ? "★" : "☆";
     });
 }
+
 
 /* PERMISSION FILTER */
 function canView(moduleName) {
