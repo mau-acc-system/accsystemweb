@@ -34,6 +34,7 @@ body {
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
+  transition: .25s;
 }
 
 .brand {
@@ -89,6 +90,10 @@ body {
   border-radius: 7px;
   cursor: pointer;
   font-size: 14px;
+}
+
+.logout:hover {
+  background: #385f8b;
 }
 
 /* MAIN */
@@ -150,7 +155,7 @@ body {
   font-size: 14px;
 }
 
-/* CARDS */
+/* SUMMARY CARDS */
 
 .stats {
   display: grid;
@@ -221,6 +226,10 @@ body {
   color: #172f50;
 }
 
+.no-access {
+  display: none;
+}
+
 /* RESPONSIVE */
 
 @media(max-width: 1000px) {
@@ -236,7 +245,6 @@ body {
     bottom: 0;
     left: -260px;
     z-index: 100;
-    transition: .25s;
     overflow-y: auto;
   }
 
@@ -288,56 +296,76 @@ body {
 
     <div class="menu-label">MAIN MENU</div>
 
-    <a class="nav-link active" href="dashboard.html">
+    <a class="nav-link active"
+       data-module="Dashboard"
+       href="dashboard.html">
       <span class="nav-icon">▦</span>
       Dashboard
     </a>
 
     <div class="menu-label">TRANSACTIONS</div>
 
-    <a class="nav-link" href="modules/banks.html">
+    <a class="nav-link"
+       data-module="Banks"
+       href="modules/banks.html">
       <span class="nav-icon">▤</span>
       Banks
     </a>
 
-    <a class="nav-link" href="modules/cash.html">
+    <a class="nav-link"
+       data-module="Cash"
+       href="modules/cash.html">
       <span class="nav-icon">◉</span>
       Cash
     </a>
 
-    <a class="nav-link" href="modules/accounts-receivable.html">
+    <a class="nav-link"
+       data-module="Accounts Receivable"
+       href="modules/accounts-receivable.html">
       <span class="nav-icon">↙</span>
       Accounts Receivable
     </a>
 
-    <a class="nav-link" href="modules/accounts-payable.html">
+    <a class="nav-link"
+       data-module="Accounts Payable"
+       href="modules/accounts-payable.html">
       <span class="nav-icon">↗</span>
       Accounts Payable
     </a>
 
-    <a class="nav-link" href="modules/general-ledger.html">
+    <a class="nav-link"
+       data-module="General Ledger"
+       href="modules/general-ledger.html">
       <span class="nav-icon">▥</span>
       General Ledger
     </a>
 
-    <a class="nav-link" href="modules/inventory.html">
+    <a class="nav-link"
+       data-module="Inventory"
+       href="modules/inventory.html">
       <span class="nav-icon">▣</span>
       Inventory
     </a>
 
     <div class="menu-label">MANAGEMENT</div>
 
-    <a class="nav-link" href="reports/financial-reports.html">
+    <a class="nav-link"
+       data-module="Reports"
+       href="reports/financial-reports.html">
       <span class="nav-icon">▧</span>
       Reports
     </a>
 
-    <a class="nav-link" href="setup/company-setup.html">
+    <a class="nav-link"
+       data-module="Setup"
+       href="setup/company-setup.html">
       <span class="nav-icon">⚙</span>
       Company Setup
     </a>
 
-    <a class="nav-link" href="setup/user-access.html">
+    <a class="nav-link"
+       data-module="Setup"
+       href="setup/user-access.html">
       <span class="nav-icon">♙</span>
       User Access
     </a>
@@ -363,13 +391,14 @@ body {
 
       <div class="user-info">
         <div>
-          <strong id="displayName">Administrator</strong>
-          <div id="userRole" style="color:#8995a5;margin-top:3px;">
-            Administrator
+          <strong id="displayName">User</strong>
+          <div id="userRole"
+               style="color:#8995a5;margin-top:3px;">
+            User
           </div>
         </div>
 
-        <div class="avatar" id="avatar">A</div>
+        <div class="avatar" id="avatar">U</div>
       </div>
 
     </header>
@@ -380,8 +409,6 @@ body {
         <h1 id="welcomeMessage">Welcome back!</h1>
         <p>Here's an overview of your accounting system.</p>
       </div>
-
-      <!-- SUMMARY CARDS -->
 
       <div class="stats">
 
@@ -411,8 +438,6 @@ body {
 
       </div>
 
-      <!-- LOWER PANELS -->
-
       <div class="lower-grid">
 
         <div class="panel">
@@ -429,7 +454,10 @@ body {
             <div>System: <strong>ACC System</strong></div>
             <div>Version: <strong>1.0.0</strong></div>
             <div>Database: <strong>Excel Database</strong></div>
-            <div>Status: <strong style="color:#21976b;">Connected</strong></div>
+            <div>
+              Status:
+              <strong style="color:#21976b;">Connected</strong>
+            </div>
           </div>
 
         </div>
@@ -448,24 +476,89 @@ body {
 // SESSION CHECK
 // =====================================
 
-const session = sessionStorage.getItem("accsystem_session");
+const sessionData = sessionStorage.getItem("accsystem_session");
 
-if (!session) {
+if (!sessionData) {
+
   window.location.replace("login.html");
+
 } else {
 
-  const user = JSON.parse(session);
+  try {
 
-  const name = user.DisplayName || user.Username || "User";
-  const role = user.Role || "User";
+    const user = JSON.parse(sessionData);
 
-  document.getElementById("displayName").textContent = name;
-  document.getElementById("userRole").textContent = role;
-  document.getElementById("welcomeMessage").textContent =
-    "Welcome back, " + name + "!";
+    const name = user.DisplayName || user.Username || "User";
+    const role = user.Role || "User";
+    const accessList = user.Access || [];
 
-  document.getElementById("avatar").textContent =
-    name.charAt(0).toUpperCase();
+    // USER INFORMATION
+
+    document.getElementById("displayName").textContent = name;
+    document.getElementById("userRole").textContent = role;
+
+    document.getElementById("welcomeMessage").textContent =
+      "Welcome back, " + name + "!";
+
+    document.getElementById("avatar").textContent =
+      name.charAt(0).toUpperCase();
+
+    // =================================
+    // USER ACCESS CONTROL
+    // =================================
+
+    const isAdmin = role.toLowerCase() === "administrator";
+
+    document.querySelectorAll("[data-module]").forEach(menu => {
+
+      const moduleName = menu.dataset.module;
+
+      const permission = accessList.find(item =>
+        String(item.Module).trim().toLowerCase() ===
+        moduleName.trim().toLowerCase()
+      );
+
+      const canView = permission &&
+        ["true", "1", "yes"].includes(
+          String(permission.CanView).toLowerCase()
+        );
+
+      if (!isAdmin && !canView) {
+        menu.style.display = "none";
+      }
+
+    });
+
+    // DASHBOARD ACCESS
+
+    const dashboardPermission = accessList.find(item =>
+      String(item.Module).trim().toLowerCase() === "dashboard"
+    );
+
+    const canViewDashboard = isAdmin || (
+      dashboardPermission &&
+      ["true", "1", "yes"].includes(
+        String(dashboardPermission.CanView).toLowerCase()
+      )
+    );
+
+    if (!canViewDashboard) {
+      document.querySelector(".content").innerHTML = `
+        <div class="panel">
+          <h3>Access Denied</h3>
+          <div class="empty">
+            You do not have permission to view the dashboard.
+          </div>
+        </div>
+      `;
+    }
+
+  } catch (error) {
+
+    sessionStorage.removeItem("accsystem_session");
+    window.location.replace("login.html");
+
+  }
 
 }
 
