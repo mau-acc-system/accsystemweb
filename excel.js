@@ -1,9 +1,16 @@
+// ==========================================
+// ACC SYSTEM - EXCEL DATABASE ENGINE
+// ==========================================
+
+// DATABASE CONFIGURATION
 const CONFIG = {
   owner: "mau-acc-system",
   repo: "accsystemdb",
   branch: "main",
   file: "Excel-Database.xlsx"
 };
+
+const LICENSE_FILE = "./license.tk";
 
 const API_URL =
   `https://api.github.com/repos/${CONFIG.owner}/${CONFIG.repo}/contents/${encodeURIComponent(CONFIG.file)}`;
@@ -12,9 +19,48 @@ let githubToken = null;
 let workbook = null;
 let fileSHA = null;
 
-// ==============================
-// LICENSE
-// ==============================
+// ==========================================
+// LICENSE DECODER
+// ==========================================
+
+function decodeLicense(encoded) {
+  const hex = encoded.trim();
+
+  if (
+    !hex ||
+    hex.length % 2 !== 0 ||
+    !/^[0-9a-f]+$/i.test(hex)
+  ) {
+    throw new Error("Invalid license file.");
+  }
+
+  const bytes = new Uint8Array(
+    hex.match(/.{2}/g).map(byte => parseInt(byte, 16))
+  );
+
+  return new TextDecoder().decode(bytes);
+}
+
+export async function loadLicense() {
+  const response = await fetch(LICENSE_FILE, {
+    cache: "no-store"
+  });
+
+  if (!response.ok) {
+    throw new Error("License file not found.");
+  }
+
+  const encoded = await response.text();
+  const token = decodeLicense(encoded);
+
+  if (!token) {
+    throw new Error("Empty license.");
+  }
+
+  githubToken = token;
+
+  return true;
+}
 
 export function setGitHubToken(token) {
   githubToken = token?.trim() || null;
@@ -30,25 +76,22 @@ export function hasLicense() {
   return Boolean(githubToken);
 }
 
-export async function validateLicense(token) {
-  if (!token || !token.trim()) {
-    return {
-      valid: false,
-      message: "Please enter your license."
-    };
-  }
+// ==========================================
+// LICENSE VALIDATION
+// ==========================================
 
-  githubToken = token.trim();
-
+export async function validateLicense() {
   try {
+    await loadLicense();
+
     const response = await githubRequest(API_URL);
 
     if (!response.ok) {
-      githubToken = null;
+      clearGitHubToken();
 
       return {
         valid: false,
-        message: "Invalid license or database access denied."
+        message: "Invalid license or access denied."
       };
     }
 
@@ -61,7 +104,7 @@ export async function validateLicense(token) {
     };
 
   } catch (error) {
-    githubToken = null;
+    clearGitHubToken();
 
     return {
       valid: false,
@@ -70,9 +113,9 @@ export async function validateLicense(token) {
   }
 }
 
-// ==============================
+// ==========================================
 // GITHUB API
-// ==============================
+// ==========================================
 
 async function githubRequest(url, options = {}) {
   if (!githubToken) {
@@ -90,13 +133,13 @@ async function githubRequest(url, options = {}) {
   });
 }
 
-// ==============================
-// READ EXCEL
-// ==============================
+// ==========================================
+// READ EXCEL DATABASE
+// ==========================================
 
 export async function readExcel() {
   if (!githubToken) {
-    throw new Error("License required.");
+    await loadLicense();
   }
 
   if (typeof XLSX === "undefined") {
@@ -112,7 +155,7 @@ export async function readExcel() {
   const data = await response.json();
 
   if (!data.content) {
-    throw new Error("Excel database content is empty or unavailable.");
+    throw new Error("Excel database content unavailable.");
   }
 
   const binary = atob(data.content.replace(/\s/g, ""));
@@ -131,9 +174,9 @@ export async function readExcel() {
   return getSheetNames();
 }
 
-// ==============================
+// ==========================================
 // SHEET FUNCTIONS
-// ==============================
+// ==========================================
 
 export function getSheetNames() {
   if (!workbook) {
@@ -159,9 +202,9 @@ export function getSheet(sheetName) {
   });
 }
 
-// ==============================
+// ==========================================
 // ADD RECORD
-// ==============================
+// ==========================================
 
 export function addRecord(sheetName, record) {
   const sheet = getWorksheet(sheetName);
@@ -192,9 +235,9 @@ export function addRecord(sheetName, record) {
   return true;
 }
 
-// ==============================
+// ==========================================
 // UPDATE RECORD
-// ==============================
+// ==========================================
 
 export function updateRecord(
   sheetName,
@@ -221,9 +264,9 @@ export function updateRecord(
   return true;
 }
 
-// ==============================
+// ==========================================
 // DELETE RECORD
-// ==============================
+// ==========================================
 
 export function deleteRecord(
   sheetName,
@@ -247,9 +290,9 @@ export function deleteRecord(
   return true;
 }
 
-// ==============================
-// SAVE EXCEL
-// ==============================
+// ==========================================
+// SAVE EXCEL DATABASE
+// ==========================================
 
 export async function saveExcel(
   message = "Update Excel database"
@@ -281,9 +324,12 @@ export async function saveExcel(
   });
 
   if (!response.ok) {
-    if (response.status === 409 || response.status === 422) {
+    if (
+      response.status === 409 ||
+      response.status === 422
+    ) {
       throw new Error(
-        "Database conflict. Reload the database before saving again."
+        "Database conflict. Reload before saving again."
       );
     }
 
@@ -297,9 +343,9 @@ export async function saveExcel(
   return true;
 }
 
-// ==============================
+// ==========================================
 // INTERNAL HELPERS
-// ==============================
+// ==========================================
 
 function getWorksheet(sheetName) {
   if (!workbook) {
@@ -332,9 +378,9 @@ function rebuildSheet(sheetName, headers, records) {
   workbook.Sheets[sheetName] = newSheet;
 }
 
-// ==============================
+// ==========================================
 // DATABASE STATUS
-// ==============================
+// ==========================================
 
 export function isDatabaseLoaded() {
   return Boolean(workbook);
