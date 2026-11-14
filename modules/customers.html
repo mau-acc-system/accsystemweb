@@ -5,231 +5,109 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Customer Master | ACC System</title>
-
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 
 <style>
 *{box-sizing:border-box}
-body{
-    margin:0;
-    padding:25px;
-    background:#f5f7fb;
-    font-family:Arial,Helvetica,sans-serif;
-    color:#1e293b;
-}
-.header{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    flex-wrap:wrap;
-    gap:15px;
-    margin-bottom:22px;
-}
-.header h2{margin:0;font-size:23px}
-.subtitle{color:#64748b;font-size:13px;margin-top:6px}
-button{
-    border:0;
-    border-radius:6px;
-    padding:10px 15px;
-    cursor:pointer;
-    font-weight:600;
-}
-.primary{background:#2563eb;color:white}
-.primary:hover{background:#1d4ed8}
-.secondary{background:#e2e8f0;color:#334155}
-.danger{background:#fee2e2;color:#b91c1c}
-.success{background:#dcfce7;color:#15803d}
-.card{
-    background:white;
-    border:1px solid #e2e8f0;
-    border-radius:10px;
-    padding:20px;
-    margin-bottom:18px;
-}
-.stats{
-    display:grid;
-    grid-template-columns:repeat(3,minmax(0,1fr));
-    gap:15px;
-    margin-bottom:18px;
-}
-.stat-label{font-size:12px;color:#64748b}
-.stat-value{font-size:25px;font-weight:700;margin-top:8px}
-.toolbar{
-    display:flex;
-    flex-wrap:wrap;
-    gap:10px;
-    margin-bottom:15px;
-}
-input,select,textarea{
-    width:100%;
-    padding:10px 11px;
-    border:1px solid #cbd5e1;
-    border-radius:6px;
-    outline:none;
-    font-size:13px;
-    background:white;
-    color:#1e293b;
-}
-input:focus,select:focus,textarea:focus{
-    border-color:#2563eb;
-}
-.search{flex:1;min-width:220px}
-.filter{width:170px}
-.table-wrap{overflow-x:auto}
-table{
-    width:100%;
-    border-collapse:collapse;
-    min-width:850px;
-}
-th,td{
-    padding:12px 10px;
-    border-bottom:1px solid #e2e8f0;
-    text-align:left;
-    font-size:13px;
-}
-th{
-    background:#f8fafc;
-    color:#475569;
-    font-size:11px;
-    text-transform:uppercase;
-    letter-spacing:.4px;
-}
-tr:hover td{background:#fafcff}
-.badge{
-    display:inline-block;
-    padding:5px 9px;
-    border-radius:20px;
-    font-size:11px;
-    font-weight:700;
-}
-.active{background:#dcfce7;color:#15803d}
-.inactive{background:#fee2e2;color:#b91c1c}
-.action-buttons{display:flex;gap:6px}
-.action-buttons button{padding:7px 10px;font-size:11px}
-.empty{text-align:center;color:#94a3b8;padding:35px}
-.modal{
-    display:none;
-    position:fixed;
-    inset:0;
-    background:rgba(15,23,42,.5);
-    z-index:100;
-    padding:20px;
-    overflow-y:auto;
-    align-items:flex-start;
-    justify-content:center;
-}
+body{margin:0;padding:28px;font-family:Arial,Helvetica,sans-serif;background:#f4f6fa;color:#26364e}
+.heading{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:22px;flex-wrap:wrap}
+.heading h2{margin:0 0 7px;font-size:23px}
+.heading p{margin:0;color:#8993a5;font-size:13px}
+button{cursor:pointer;font-family:inherit}
+.primary-btn{border:0;border-radius:6px;background:#315efb;color:white;padding:11px 18px;font-size:12px;font-weight:bold}
+.primary-btn:hover{background:#244bd2}
+.primary-btn:disabled{opacity:.6;cursor:wait}
+.panel{background:white;border:1px solid #e8ecf2;border-radius:10px;padding:22px;margin-bottom:20px}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-bottom:20px}
+.stat{background:white;border:1px solid #e8ecf2;border-radius:9px;padding:17px}
+.stat-label{font-size:11px;color:#8993a5}
+.stat-value{font-size:23px;font-weight:bold;margin-top:9px}
+.toolbar{display:grid;grid-template-columns:minmax(180px,1fr) 180px;gap:10px;margin-bottom:18px}
+input,select,textarea{width:100%;min-height:40px;border:1px solid #dce2eb;border-radius:6px;padding:9px 11px;font-family:inherit;font-size:12px;outline:none;background:white;color:#26364e}
+input:focus,select:focus,textarea:focus{border-color:#315efb;box-shadow:0 0 0 3px rgba(49,94,251,.08)}
+.table-wrapper{width:100%;overflow-x:auto}
+table{width:100%;min-width:950px;border-collapse:collapse}
+thead{background:#f3f5f9}
+th{padding:13px 12px;text-align:left;color:#65748b;font-size:11px;white-space:nowrap}
+td{padding:13px 12px;border-bottom:1px solid #edf0f5;font-size:12px}
+tr:hover td{background:#fafbfe}
+.customer-code{font-weight:bold;color:#315efb}
+.status-active{color:#16834b;font-weight:bold}
+.status-inactive{color:#c03939;font-weight:bold}
+.table-action{border:0;background:transparent;color:#315efb;font-size:11px;font-weight:bold;margin-right:9px}
+.table-action.danger{color:#d04444}
+.table-action.success{color:#16834b}
+.empty{text-align:center;padding:35px;color:#8993a5}
+.message{display:none;padding:12px 14px;border-radius:6px;font-size:12px;margin-bottom:18px;white-space:pre-wrap}
+.message.success{display:block;background:#e8f8ef;color:#16834b}
+.message.error{display:block;background:#fff0f0;color:#c03939}
+.modal{display:none;position:fixed;inset:0;background:rgba(12,24,44,.55);z-index:1000;align-items:center;justify-content:center;padding:18px}
 .modal.show{display:flex}
-.modal-box{
-    width:100%;
-    max-width:750px;
-    background:white;
-    border-radius:12px;
-    padding:23px;
-    margin:auto;
-}
-.modal-header{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin-bottom:20px;
-}
-.modal-header h3{margin:0}
-.close{
-    background:#f1f5f9;
-    font-size:18px;
-    padding:5px 10px;
-}
-.form-grid{
-    display:grid;
-    grid-template-columns:repeat(2,minmax(0,1fr));
-    gap:15px;
-}
-.field label{
-    display:block;
-    font-size:12px;
-    font-weight:700;
-    margin-bottom:7px;
-    color:#475569;
-}
-.full{grid-column:1/-1}
-.modal-footer{
-    display:flex;
-    justify-content:flex-end;
-    gap:10px;
-    margin-top:22px;
-}
-.notice{
-    padding:12px 14px;
-    border-radius:7px;
-    margin-bottom:15px;
-    font-size:13px;
-    display:none;
-}
-.notice.error{display:block;background:#fee2e2;color:#991b1b}
-.notice.info{display:block;background:#dbeafe;color:#1e40af}
-#loading{
-    color:#64748b;
-    font-size:13px;
-    margin-bottom:12px;
-}
-@media(max-width:650px){
-    body{padding:15px}
-    .stats{grid-template-columns:1fr}
-    .form-grid{grid-template-columns:1fr}
-    .full{grid-column:auto}
-    .filter{width:100%}
+.modal-content{width:100%;max-width:750px;max-height:90vh;overflow-y:auto;background:white;border-radius:10px;padding:25px;box-shadow:0 15px 50px rgba(0,0,0,.15)}
+.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px}
+.modal-header h3{margin:0;font-size:17px}
+.close-btn{border:0;background:transparent;font-size:24px;color:#8993a5}
+.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:17px}
+.field{display:flex;flex-direction:column;gap:7px}
+.field.full{grid-column:1/-1}
+.field label{font-size:11px;font-weight:bold;color:#536176}
+textarea{min-height:75px;resize:vertical}
+.readonly{background:#f3f5f9;color:#65748b}
+.modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:23px;padding-top:18px;border-top:1px solid #edf0f5}
+.secondary-btn{border:1px solid #dce2eb;background:#f8f9fc;color:#536176;padding:10px 17px;border-radius:6px;font-size:12px}
+.loading{text-align:center;color:#8993a5;padding:25px}
+@media(max-width:850px){.stats{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:550px){
+body{padding:16px}
+.stats{grid-template-columns:1fr 1fr}
+.toolbar{grid-template-columns:1fr}
+.form-grid{grid-template-columns:1fr}
+.field.full{grid-column:auto}
+.panel{padding:15px}
 }
 </style>
 </head>
 
 <body>
 
-<div class="header">
+<div class="heading">
     <div>
         <h2>Customer Master</h2>
-        <div class="subtitle">Manage customer records and credit information</div>
+        <p>Manage customer information and credit terms.</p>
     </div>
-    <button class="primary" id="addButton" onclick="openAddModal()">
-        + Add Customer
-    </button>
+    <button class="primary-btn" id="addButton" type="button">+ Add Customer</button>
 </div>
 
-<div id="notice" class="notice"></div>
-<div id="loading">Loading customer database...</div>
+<div id="message" class="message"></div>
 
 <div class="stats">
-    <div class="card">
+    <div class="stat">
         <div class="stat-label">Total Customers</div>
-        <div class="stat-value" id="totalCount">0</div>
+        <div class="stat-value" id="totalCustomers">0</div>
     </div>
-    <div class="card">
+    <div class="stat">
         <div class="stat-label">Active Customers</div>
-        <div class="stat-value" id="activeCount">0</div>
+        <div class="stat-value" id="activeCustomers">0</div>
     </div>
-    <div class="card">
+    <div class="stat">
         <div class="stat-label">Inactive Customers</div>
-        <div class="stat-value" id="inactiveCount">0</div>
+        <div class="stat-value" id="inactiveCustomers">0</div>
     </div>
 </div>
 
-<div class="card">
+<div class="panel">
     <div class="toolbar">
-        <input
-            type="text"
-            id="searchInput"
-            class="search"
-            placeholder="Search customer ID, code, name, TIN..."
-            oninput="renderTable()"
-        >
+        <input type="search" id="searchInput"
+            placeholder="Search customer code, name, TIN, contact...">
 
-        <select id="statusFilter" class="filter" onchange="renderTable()">
-            <option value="all">All Status</option>
-            <option value="true">Active</option>
-            <option value="false">Inactive</option>
+        <select id="statusFilter">
+            <option value="Active">Active Only</option>
+            <option value="Inactive">Inactive Only</option>
+            <option value="All">All Status</option>
         </select>
     </div>
 
-    <div class="table-wrap">
+    <div class="table-wrapper">
         <table>
             <thead>
                 <tr>
@@ -244,99 +122,101 @@ tr:hover td{background:#fafcff}
                 </tr>
             </thead>
             <tbody id="customerTable">
-                <tr><td colspan="8" class="empty">Loading...</td></tr>
+                <tr><td colspan="8" class="loading">Loading customers...</td></tr>
             </tbody>
         </table>
     </div>
 </div>
 
-<!-- CUSTOMER MODAL -->
 <div class="modal" id="customerModal">
-    <div class="modal-box">
+    <div class="modal-content">
         <div class="modal-header">
-            <h3 id="modalTitle">Add Customer</h3>
-            <button class="close" onclick="closeModal()">×</button>
+            <h3 id="modalTitle">Add New Customer</h3>
+            <button type="button" class="close-btn" id="closeModal">&times;</button>
         </div>
 
-        <div class="form-grid">
+        <form id="customerForm">
+            <div class="form-grid">
 
-            <div class="field">
-                <label>Customer ID</label>
-                <input id="customerID" readonly>
+                <div class="field">
+                    <label for="customerID">Customer ID</label>
+                    <input id="customerID" class="readonly" readonly>
+                </div>
+
+                <div class="field">
+                    <label for="customerCode">Customer Code *</label>
+                    <input id="customerCode" required maxlength="30" placeholder="e.g. CUST-001">
+                </div>
+
+                <div class="field full">
+                    <label for="customerName">Customer Name *</label>
+                    <input id="customerName" required maxlength="150" placeholder="Customer or company name">
+                </div>
+
+                <div class="field">
+                    <label for="contactPerson">Contact Person</label>
+                    <input id="contactPerson" maxlength="100">
+                </div>
+
+                <div class="field">
+                    <label for="tin">TIN</label>
+                    <input id="tin" maxlength="30">
+                </div>
+
+                <div class="field full">
+                    <label for="billingAddress">Billing Address</label>
+                    <textarea id="billingAddress"></textarea>
+                </div>
+
+                <div class="field">
+                    <label for="email">Email</label>
+                    <input id="email" type="email">
+                </div>
+
+                <div class="field">
+                    <label for="phone">Phone</label>
+                    <input id="phone" maxlength="40">
+                </div>
+
+                <div class="field">
+                    <label for="paymentTerms">Payment Terms</label>
+                    <select id="paymentTerms">
+                        <option value="COD">COD</option>
+                        <option value="Due on Receipt">Due on Receipt</option>
+                        <option value="Net 7">Net 7</option>
+                        <option value="Net 15">Net 15</option>
+                        <option value="Net 30" selected>Net 30</option>
+                        <option value="Net 45">Net 45</option>
+                        <option value="Net 60">Net 60</option>
+                    </select>
+                </div>
+
+                <div class="field">
+                    <label for="creditLimit">Credit Limit (PHP)</label>
+                    <input id="creditLimit" type="number" min="0" step="0.01" value="0">
+                </div>
+
+                <div class="field">
+                    <label for="accountStatus">Account Status</label>
+                    <select id="accountStatus">
+                        <option value="TRUE">Active</option>
+                        <option value="FALSE">Inactive</option>
+                    </select>
+                </div>
+
             </div>
 
-            <div class="field">
-                <label>Customer Code *</label>
-                <input id="customerCode" maxlength="30" placeholder="e.g. CUST-001">
+            <div class="modal-actions">
+                <button type="button" class="secondary-btn" id="cancelButton">Cancel</button>
+                <button type="submit" class="primary-btn" id="saveButton">Save Customer</button>
             </div>
-
-            <div class="field full">
-                <label>Customer Name *</label>
-                <input id="customerName" maxlength="150" placeholder="Enter customer or company name">
-            </div>
-
-            <div class="field">
-                <label>Contact Person</label>
-                <input id="contactPerson" maxlength="100">
-            </div>
-
-            <div class="field">
-                <label>TIN</label>
-                <input id="tin" maxlength="30">
-            </div>
-
-            <div class="field full">
-                <label>Billing Address</label>
-                <textarea id="billingAddress" rows="2"></textarea>
-            </div>
-
-            <div class="field">
-                <label>Email</label>
-                <input id="email" type="email">
-            </div>
-
-            <div class="field">
-                <label>Phone</label>
-                <input id="phone" maxlength="40">
-            </div>
-
-            <div class="field">
-                <label>Payment Terms</label>
-                <select id="paymentTerms">
-                    <option value="COD">COD</option>
-                    <option value="Due on Receipt">Due on Receipt</option>
-                    <option value="Net 7">Net 7</option>
-                    <option value="Net 15">Net 15</option>
-                    <option value="Net 30" selected>Net 30</option>
-                    <option value="Net 45">Net 45</option>
-                    <option value="Net 60">Net 60</option>
-                </select>
-            </div>
-
-            <div class="field">
-                <label>Credit Limit (PHP)</label>
-                <input id="creditLimit" type="number" min="0" step="0.01" value="0">
-            </div>
-
-            <div class="field">
-                <label>Account Status</label>
-                <select id="isActive">
-                    <option value="true">Active</option>
-                    <option value="false">Inactive</option>
-                </select>
-            </div>
-
-        </div>
-
-        <div class="modal-footer">
-            <button class="secondary" onclick="closeModal()">Cancel</button>
-            <button class="primary" id="saveButton" onclick="saveCustomer()">Save Customer</button>
-        </div>
+        </form>
     </div>
 </div>
 
 <script type="module">
 import {
+    validateLicense,
     readExcel,
     getSheet,
     addRecord,
@@ -344,127 +224,136 @@ import {
     saveExcel
 } from "../excel.js";
 
-let customers = [];
-let currentSession = null;
-let editingID = null;
-let canCreate = false;
-let canEdit = false;
-let canDelete = false;
+/* SESSION AND PERMISSIONS */
 
-const $ = id => document.getElementById(id);
+const session = JSON.parse(
+    sessionStorage.getItem("accsystem_session") || "null"
+);
 
-function showNotice(message,type="info"){
-    const notice=$("notice");
-    notice.textContent=message;
-    notice.className="notice "+type;
-    window.scrollTo({top:0,behavior:"smooth"});
+if (!session) {
+    window.top.location.href = "../login.html";
 }
 
-function hideNotice(){
-    $("notice").className="notice";
+if (!session) {
+    throw new Error("No active session");
 }
 
-function isTrue(value){
-    return value===true ||
-        String(value).toLowerCase()==="true" ||
-        String(value)==="1";
-}
+const userAccess = session.Access || [];
+const isAdmin = session.Role === "Administrator";
 
-function checkSession(){
-    const raw=sessionStorage.getItem("accsystem_session");
+function hasPermission(permission) {
+    if (isAdmin) return true;
 
-    if(!raw){
-        window.top.location.href="../login.html";
-        return false;
-    }
-
-    try{
-        currentSession=JSON.parse(raw);
-    }catch(error){
-        window.top.location.href="../login.html";
-        return false;
-    }
-
-    const isAdmin=currentSession.Role==="Administrator";
-    const access=Array.isArray(currentSession.Access)
-        ? currentSession.Access
-        : [];
-
-    const permission=access.find(item =>
-        item.Module==="Accounts Receivable" &&
-        (!item.Page || item.Page==="Customers" || item.Page==="Customer Master")
+    return userAccess.some(row =>
+        String(row.Module).trim() === "Accounts Receivable" &&
+        (row.CanView === true || String(row.CanView).toLowerCase() === "true") &&
+        (row[permission] === true || String(row[permission]).toLowerCase() === "true")
     );
-
-    canCreate=isAdmin || (permission && isTrue(permission.CanCreate));
-    canEdit=isAdmin || (permission && isTrue(permission.CanEdit));
-    canDelete=isAdmin || (permission && isTrue(permission.CanDelete));
-
-    if(!isAdmin && !permission){
-        document.body.innerHTML=`
-            <div style="padding:40px;font-family:Arial">
-                <h2>Access Denied</h2>
-                <p>You do not have access to Customer Master.</p>
-            </div>`;
-        return false;
-    }
-
-    $("addButton").style.display=canCreate?"inline-block":"none";
-
-    return true;
 }
 
-function normalizeCustomers(){
-    const data=getSheet("Customers");
-    customers=Array.isArray(data)?data:[];
+const canView = isAdmin || userAccess.some(row =>
+    String(row.Module).trim() === "Accounts Receivable" &&
+    (row.CanView === true || String(row.CanView).toLowerCase() === "true")
+);
+
+if (!canView) {
+    document.body.innerHTML =
+        "<h2>Access Denied</h2><p>You do not have permission to view Customer Master.</p>";
+    throw new Error("Insufficient permissions");
 }
 
-function generateCustomerID(){
-    let highest=0;
+const canCreate = hasPermission("CanCreate");
+const canEdit = hasPermission("CanEdit");
+const canDelete = hasPermission("CanDelete");
 
-    customers.forEach(customer=>{
-        const id=String(customer.CustomerID||"");
-        const match=id.match(/^CU(\d+)$/i);
+const SHEET_NAME = "Customers";
 
-        if(match){
-            highest=Math.max(highest,Number(match[1]));
+const message = document.getElementById("message");
+const customerTable = document.getElementById("customerTable");
+const modal = document.getElementById("customerModal");
+const form = document.getElementById("customerForm");
+const saveButton = document.getElementById("saveButton");
+const addButton = document.getElementById("addButton");
+
+let customers = [];
+let editingCustomerID = null;
+let databaseReady = false;
+
+addButton.style.display = canCreate ? "" : "none";
+
+/* UTILITIES */
+
+function showMessage(text, type) {
+    message.textContent = text;
+    message.className = "message " + type;
+}
+
+function hideMessage() {
+    message.textContent = "";
+    message.className = "message";
+}
+
+function isActive(value) {
+    return value === true ||
+        String(value).toLowerCase() === "true" ||
+        String(value) === "1";
+}
+
+function escapeHTML(value) {
+    return String(value ?? "").replace(/[&<>"']/g, char => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+    })[char]);
+}
+
+function formatMoney(value) {
+    return new Intl.NumberFormat("en-PH", {
+        style: "currency",
+        currency: "PHP",
+        minimumFractionDigits: 2
+    }).format(Number(value) || 0);
+}
+
+function generateCustomerID() {
+    let highest = 0;
+
+    customers.forEach(customer => {
+        const match = String(customer.CustomerID || "").match(/^CU(\d+)$/i);
+
+        if (match) {
+            highest = Math.max(highest, Number(match[1]));
         }
     });
 
-    return "CU"+String(highest+1).padStart(4,"0");
+    return "CU" + String(highest + 1).padStart(4, "0");
 }
 
-function formatMoney(value){
-    return new Intl.NumberFormat("en-PH",{
-        style:"currency",
-        currency:"PHP",
-        minimumFractionDigits:2
-    }).format(Number(value)||0);
+/* DASHBOARD COUNTS */
+
+function updateStats() {
+    document.getElementById("totalCustomers").textContent =
+        customers.length;
+
+    document.getElementById("activeCustomers").textContent =
+        customers.filter(customer => isActive(customer.IsActive)).length;
+
+    document.getElementById("inactiveCustomers").textContent =
+        customers.filter(customer => !isActive(customer.IsActive)).length;
 }
 
-function escapeHTML(value){
-    return String(value??"").replace(/[&<>"']/g,char=>({
-        "&":"&amp;",
-        "<":"&lt;",
-        ">":"&gt;",
-        '"':"&quot;",
-        "'":"&#39;"
-    }[char]));
-}
+/* TABLE */
 
-function updateStats(){
-    const active=customers.filter(c=>isTrue(c.IsActive)).length;
+function renderCustomers() {
+    const search = document.getElementById("searchInput")
+        .value.trim().toLowerCase();
 
-    $("totalCount").textContent=customers.length;
-    $("activeCount").textContent=active;
-    $("inactiveCount").textContent=customers.length-active;
-}
+    const status = document.getElementById("statusFilter").value;
 
-function renderTable(){
-    const search=$("searchInput").value.trim().toLowerCase();
-    const status=$("statusFilter").value;
-
-    let filtered=customers.filter(customer=>{
-        const searchable=[
+    const filtered = customers.filter(customer => {
+        const searchable = [
             customer.CustomerID,
             customer.CustomerCode,
             customer.CustomerName,
@@ -474,269 +363,346 @@ function renderTable(){
             customer.Phone
         ].join(" ").toLowerCase();
 
-        const matchesSearch=searchable.includes(search);
-        const active=isTrue(customer.IsActive);
+        const matchesSearch = searchable.includes(search);
+        const active = isActive(customer.IsActive);
 
-        const matchesStatus=status==="all" ||
-            (status==="true" && active) ||
-            (status==="false" && !active);
+        const matchesStatus =
+            status === "All" ||
+            (status === "Active" && active) ||
+            (status === "Inactive" && !active);
 
         return matchesSearch && matchesStatus;
     });
 
-    filtered.sort((a,b)=>
-        String(a.CustomerName||"").localeCompare(String(b.CustomerName||""))
-    );
+    customerTable.innerHTML = "";
 
-    const tbody=$("customerTable");
-
-    if(!filtered.length){
-        tbody.innerHTML=`
-            <tr>
-                <td colspan="8" class="empty">No customer records found.</td>
-            </tr>`;
+    if (!filtered.length) {
+        customerTable.innerHTML =
+            '<tr><td colspan="8" class="empty">No customers found.</td></tr>';
         updateStats();
         return;
     }
 
-    tbody.innerHTML=filtered.map(customer=>{
-        const active=isTrue(customer.IsActive);
+    filtered.sort((a, b) =>
+        String(a.CustomerName || "").localeCompare(String(b.CustomerName || ""))
+    );
 
-        let actions="";
+    filtered.forEach(customer => {
+        const tr = document.createElement("tr");
 
-        if(canEdit){
-            actions+=`
-                <button class="secondary"
-                    onclick="editCustomer('${escapeHTML(customer.CustomerID)}')">
-                    Edit
-                </button>`;
-        }
+        const statusText = isActive(customer.IsActive)
+            ? '<span class="status-active">Active</span>'
+            : '<span class="status-inactive">Inactive</span>';
 
-        if(canDelete){
-            actions+=`
-                <button class="${active?"danger":"success"}"
-                    onclick="toggleCustomer('${escapeHTML(customer.CustomerID)}')">
-                    ${active?"Deactivate":"Activate"}
-                </button>`;
-        }
+        const actions = `
+            ${canEdit ? `<button class="table-action" data-action="edit" data-id="${escapeHTML(customer.CustomerID)}">Edit</button>` : ""}
+            ${canDelete ? `<button class="table-action ${isActive(customer.IsActive) ? "danger" : "success"}" data-action="toggle" data-id="${escapeHTML(customer.CustomerID)}">${isActive(customer.IsActive) ? "Deactivate" : "Activate"}</button>` : ""}
+        `;
 
-        return `
-            <tr>
-                <td>${escapeHTML(customer.CustomerID)}</td>
-                <td>${escapeHTML(customer.CustomerCode)}</td>
-                <td><strong>${escapeHTML(customer.CustomerName)}</strong></td>
-                <td>${escapeHTML(customer.ContactPerson||"-")}</td>
-                <td>${escapeHTML(customer.PaymentTerms||"-")}</td>
-                <td>${formatMoney(customer.CreditLimit)}</td>
-                <td>
-                    <span class="badge ${active?"active":"inactive"}">
-                        ${active?"Active":"Inactive"}
-                    </span>
-                </td>
-                <td>
-                    <div class="action-buttons">${actions||"-"}</div>
-                </td>
-            </tr>`;
-    }).join("");
+        tr.innerHTML = `
+            <td>${escapeHTML(customer.CustomerID)}</td>
+            <td class="customer-code">${escapeHTML(customer.CustomerCode)}</td>
+            <td>${escapeHTML(customer.CustomerName)}</td>
+            <td>${escapeHTML(customer.ContactPerson || "-")}</td>
+            <td>${escapeHTML(customer.PaymentTerms || "-")}</td>
+            <td>${formatMoney(customer.CreditLimit)}</td>
+            <td>${statusText}</td>
+            <td>${actions || "-"}</td>
+        `;
+
+        customerTable.appendChild(tr);
+    });
 
     updateStats();
 }
 
-function clearForm(){
-    [
-        "customerCode","customerName","contactPerson","tin",
-        "billingAddress","email","phone"
-    ].forEach(id=>$(id).value="");
+/* MODAL */
 
-    $("paymentTerms").value="Net 30";
-    $("creditLimit").value="0";
-    $("isActive").value="true";
+function openModal(customer = null) {
+    hideMessage();
+    form.reset();
+
+    editingCustomerID = customer ? customer.CustomerID : null;
+
+    document.getElementById("modalTitle").textContent =
+        customer ? "Edit Customer" : "Add New Customer";
+
+    document.getElementById("customerID").value =
+        customer?.CustomerID || generateCustomerID();
+
+    document.getElementById("customerCode").value =
+        customer?.CustomerCode || "";
+
+    document.getElementById("customerName").value =
+        customer?.CustomerName || "";
+
+    document.getElementById("contactPerson").value =
+        customer?.ContactPerson || "";
+
+    document.getElementById("tin").value =
+        customer?.TIN || "";
+
+    document.getElementById("billingAddress").value =
+        customer?.BillingAddress || "";
+
+    document.getElementById("email").value =
+        customer?.Email || "";
+
+    document.getElementById("phone").value =
+        customer?.Phone || "";
+
+    document.getElementById("paymentTerms").value =
+        customer?.PaymentTerms || "Net 30";
+
+    document.getElementById("creditLimit").value =
+        Number(customer?.CreditLimit) || 0;
+
+    document.getElementById("accountStatus").value =
+        customer ? (isActive(customer.IsActive) ? "TRUE" : "FALSE") : "TRUE";
+
+    document.getElementById("customerCode").readOnly = Boolean(customer);
+    document.getElementById("customerCode").classList.toggle("readonly", Boolean(customer));
+
+    saveButton.textContent = customer ? "Update Customer" : "Save Customer";
+
+    modal.classList.add("show");
 }
 
-window.openAddModal=function(){
-    if(!canCreate){
-        showNotice("You do not have permission to create customers.","error");
-        return;
-    }
+function closeModal() {
+    modal.classList.remove("show");
+    form.reset();
+    editingCustomerID = null;
+}
 
-    editingID=null;
-    clearForm();
+/* DATABASE REFRESH */
 
-    $("modalTitle").textContent="Add Customer";
-    $("customerID").value=generateCustomerID();
-    $("saveButton").textContent="Save Customer";
-    $("customerModal").classList.add("show");
-};
+function refreshFromDatabase() {
+    customers = getSheet(SHEET_NAME) || [];
+    renderCustomers();
+}
 
-window.editCustomer=function(id){
-    if(!canEdit)return;
+/* EVENTS */
 
-    const customer=customers.find(c=>String(c.CustomerID)===String(id));
-    if(!customer)return;
+document.getElementById("searchInput").addEventListener("input", renderCustomers);
+document.getElementById("statusFilter").addEventListener("change", renderCustomers);
 
-    editingID=id;
+addButton.addEventListener("click", () => {
+    if (databaseReady && canCreate) openModal();
+});
 
-    $("modalTitle").textContent="Edit Customer";
-    $("customerID").value=customer.CustomerID||"";
-    $("customerCode").value=customer.CustomerCode||"";
-    $("customerName").value=customer.CustomerName||"";
-    $("contactPerson").value=customer.ContactPerson||"";
-    $("tin").value=customer.TIN||"";
-    $("billingAddress").value=customer.BillingAddress||"";
-    $("email").value=customer.Email||"";
-    $("phone").value=customer.Phone||"";
-    $("paymentTerms").value=customer.PaymentTerms||"Net 30";
-    $("creditLimit").value=Number(customer.CreditLimit)||0;
-    $("isActive").value=isTrue(customer.IsActive)?"true":"false";
+document.getElementById("closeModal").addEventListener("click", closeModal);
+document.getElementById("cancelButton").addEventListener("click", closeModal);
 
-    $("saveButton").textContent="Update Customer";
-    $("customerModal").classList.add("show");
-};
+modal.addEventListener("click", event => {
+    if (event.target === modal) closeModal();
+});
 
-window.closeModal=function(){
-    $("customerModal").classList.remove("show");
-};
+/* TABLE ACTIONS */
 
-window.saveCustomer=async function(){
-    hideNotice();
+customerTable.addEventListener("click", async event => {
+    const button = event.target.closest("button[data-action]");
+    if (!button) return;
 
-    const code=$("customerCode").value.trim();
-    const name=$("customerName").value.trim();
-    const creditLimit=Number($("creditLimit").value);
-
-    if(!code || !name){
-        showNotice("Customer Code and Customer Name are required.","error");
-        return;
-    }
-
-    if(!Number.isFinite(creditLimit)||creditLimit<0){
-        showNotice("Please enter a valid non-negative credit limit.","error");
-        return;
-    }
-
-    const duplicate=customers.find(c=>
-        String(c.CustomerCode||"").toLowerCase()===code.toLowerCase() &&
-        String(c.CustomerID)!==String(editingID)
+    const customer = customers.find(
+        item => String(item.CustomerID) === button.dataset.id
     );
 
-    if(duplicate){
-        showNotice("Customer Code already exists.","error");
+    if (!customer) return;
+
+    if (button.dataset.action === "edit") {
+        if (!canEdit) return;
+        openModal(customer);
         return;
     }
 
-    const now=new Date().toISOString();
+    if (button.dataset.action === "toggle") {
+        if (!canDelete) return;
 
-    const record={
-        CustomerID:$("customerID").value,
-        CustomerCode:code,
-        CustomerName:name,
-        ContactPerson:$("contactPerson").value.trim(),
-        TIN:$("tin").value.trim(),
-        BillingAddress:$("billingAddress").value.trim(),
-        Email:$("email").value.trim(),
-        Phone:$("phone").value.trim(),
-        PaymentTerms:$("paymentTerms").value,
-        CreditLimit:creditLimit,
-        IsActive:$("isActive").value==="true",
-        CreatedAt:editingID
-            ? customers.find(c=>String(c.CustomerID)===String(editingID))?.CreatedAt||now
-            : now,
-        UpdatedAt:now
-    };
+        const nextStatus = !isActive(customer.IsActive);
 
-    const saveButton=$("saveButton");
-    saveButton.disabled=true;
-    saveButton.textContent="Saving...";
+        const confirmed = confirm(
+            `${nextStatus ? "Activate" : "Deactivate"} ${customer.CustomerName}?`
+        );
 
-    try{
-        if(editingID){
-            if(!canEdit)throw new Error("You do not have permission to edit customers.");
+        if (!confirmed) return;
 
-            await updateRecord(
-                "Customers",
+        try {
+            button.disabled = true;
+
+            updateRecord(
+                SHEET_NAME,
                 "CustomerID",
-                editingID,
-                record
+                customer.CustomerID,
+                {
+                    IsActive: nextStatus,
+                    UpdatedAt: new Date().toISOString()
+                }
             );
-        }else{
-            if(!canCreate)throw new Error("You do not have permission to create customers.");
 
-            await addRecord("Customers",record);
+            await saveExcel();
+            refreshFromDatabase();
+
+            showMessage("Customer status successfully updated.", "success");
+
+        } catch (error) {
+            showMessage(
+                "Unable to update customer: " + error.message,
+                "error"
+            );
+            button.disabled = false;
+        }
+    }
+});
+
+/* SAVE CUSTOMER */
+
+form.addEventListener("submit", async event => {
+    event.preventDefault();
+    hideMessage();
+
+    if (!databaseReady) {
+        showMessage("Database is not ready.", "error");
+        return;
+    }
+
+    const customerCode = document.getElementById("customerCode").value.trim();
+    const customerName = document.getElementById("customerName").value.trim();
+    const contactPerson = document.getElementById("contactPerson").value.trim();
+    const tin = document.getElementById("tin").value.trim();
+    const billingAddress = document.getElementById("billingAddress").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const phone = document.getElementById("phone").value.trim();
+    const paymentTerms = document.getElementById("paymentTerms").value;
+    const creditLimit = Number(document.getElementById("creditLimit").value);
+    const active = document.getElementById("accountStatus").value === "TRUE";
+
+    if (!customerCode || !customerName) {
+        showMessage("Please complete Customer Code and Customer Name.", "error");
+        return;
+    }
+
+    if (!Number.isFinite(creditLimit) || creditLimit < 0) {
+        showMessage("Please enter a valid non-negative Credit Limit.", "error");
+        return;
+    }
+
+    if (email && !document.getElementById("email").checkValidity()) {
+        showMessage("Please enter a valid email address.", "error");
+        return;
+    }
+
+    const duplicateCode = customers.some(customer =>
+        String(customer.CustomerCode || "").trim().toLowerCase() === customerCode.toLowerCase() &&
+        String(customer.CustomerID) !== String(editingCustomerID || "")
+    );
+
+    if (duplicateCode) {
+        showMessage("Customer Code already exists.", "error");
+        return;
+    }
+
+    saveButton.disabled = true;
+    saveButton.textContent = "Saving...";
+
+    const wasEditing = Boolean(editingCustomerID);
+
+    try {
+        const now = new Date().toISOString();
+
+        if (editingCustomerID) {
+            if (!canEdit) throw new Error("You do not have edit permission.");
+
+            const current = customers.find(
+                item => String(item.CustomerID) === String(editingCustomerID)
+            );
+
+            updateRecord(
+                SHEET_NAME,
+                "CustomerID",
+                editingCustomerID,
+                {
+                    CustomerName: customerName,
+                    ContactPerson: contactPerson,
+                    TIN: tin,
+                    BillingAddress: billingAddress,
+                    Email: email,
+                    Phone: phone,
+                    PaymentTerms: paymentTerms,
+                    CreditLimit: creditLimit,
+                    IsActive: active,
+                    UpdatedAt: now
+                }
+            );
+
+        } else {
+            if (!canCreate) throw new Error("You do not have create permission.");
+
+            const newCustomer = {
+                CustomerID: generateCustomerID(),
+                CustomerCode: customerCode,
+                CustomerName: customerName,
+                ContactPerson: contactPerson,
+                TIN: tin,
+                BillingAddress: billingAddress,
+                Email: email,
+                Phone: phone,
+                PaymentTerms: paymentTerms,
+                CreditLimit: creditLimit,
+                IsActive: active,
+                CreatedAt: now,
+                UpdatedAt: now
+            };
+
+            addRecord(SHEET_NAME, newCustomer);
         }
 
         await saveExcel();
-
-        normalizeCustomers();
-        renderTable();
+        refreshFromDatabase();
         closeModal();
 
-        showNotice(
-            editingID
-                ?"Customer updated successfully."
-                :"Customer created successfully.",
-            "info"
+        showMessage(
+            wasEditing
+                ? "Customer successfully updated."
+                : "New customer successfully created.",
+            "success"
         );
 
-    }catch(error){
-        console.error(error);
-        showNotice("Unable to save customer: "+error.message,"error");
-    }finally{
-        saveButton.disabled=false;
-        saveButton.textContent=editingID?"Update Customer":"Save Customer";
-    }
-};
-
-window.toggleCustomer=async function(id){
-    if(!canDelete)return;
-
-    const customer=customers.find(c=>String(c.CustomerID)===String(id));
-    if(!customer)return;
-
-    const currentlyActive=isTrue(customer.IsActive);
-    const action=currentlyActive?"deactivate":"activate";
-
-    if(!confirm(`Are you sure you want to ${action} ${customer.CustomerName}?`)){
-        return;
-    }
-
-    try{
-        await updateRecord(
-            "Customers",
-            "CustomerID",
-            id,
-            {
-                IsActive:!currentlyActive,
-                UpdatedAt:new Date().toISOString()
-            }
+    } catch (error) {
+        showMessage(
+            "Unable to save customer: " + error.message,
+            "error"
         );
-
-        await saveExcel();
-
-        normalizeCustomers();
-        renderTable();
-
-        showNotice(`Customer ${action}d successfully.`,"info");
-
-    }catch(error){
-        console.error(error);
-        showNotice("Unable to update customer: "+error.message,"error");
+    } finally {
+        saveButton.disabled = false;
+        saveButton.textContent = "Save Customer";
     }
-};
+});
 
-async function initialize(){
-    try{
-        if(!checkSession())return;
+/* INITIALIZATION - SAME METHOD AS CHART OF ACCOUNTS */
+
+async function initialize() {
+    try {
+        const license = await validateLicense();
+
+        if (!license.valid) {
+            throw new Error(license.message || "License validation failed.");
+        }
 
         await readExcel();
-        normalizeCustomers();
 
-        $("loading").style.display="none";
-        renderTable();
+        customers = getSheet(SHEET_NAME) || [];
+        databaseReady = true;
 
-    }catch(error){
-        console.error(error);
-        $("loading").textContent="Unable to load customer database: "+error.message;
-        showNotice("Database loading failed. Please refresh the page.","error");
+        renderCustomers();
+
+    } catch (error) {
+        customerTable.innerHTML =
+            `<tr><td colspan="8" class="empty">Unable to load customers.</td></tr>`;
+
+        showMessage(
+            "Database connection failed: " + error.message,
+            "error"
+        );
     }
 }
 
