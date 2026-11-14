@@ -1,547 +1,565 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ACC System | Login</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ACC System | Login</title>
 
-  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: Arial, sans-serif;
-    }
+<style>
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+}
 
-    body {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #f1f4f9;
-      padding: 20px;
-    }
+body {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f1f4f9;
+  padding: 20px;
+}
 
-    .login-card {
-      width: 100%;
-      max-width: 400px;
-      background: white;
-      padding: 35px;
-      border-radius: 14px;
-      box-shadow: 0 8px 30px rgba(0,0,0,.08);
-    }
+.login-card {
+  width: 100%;
+  max-width: 400px;
+  background: white;
+  padding: 35px;
+  border-radius: 14px;
+  box-shadow: 0 8px 30px rgba(0,0,0,.08);
+}
 
-    .logo {
-      text-align: center;
-      margin-bottom: 28px;
-    }
+.logo {
+  text-align: center;
+  margin-bottom: 28px;
+}
 
-    .logo h1 {
-      color: #183153;
-      font-size: 25px;
-      margin-bottom: 8px;
-    }
+.logo h1 {
+  color: #183153;
+  font-size: 25px;
+  margin-bottom: 8px;
+}
 
-    .logo p {
-      color: #777;
-      font-size: 13px;
-    }
+.logo p {
+  color: #777;
+  font-size: 13px;
+}
 
-    .field {
-      margin-bottom: 18px;
-    }
+.field {
+  margin-bottom: 18px;
+}
 
-    .field label {
-      display: block;
-      font-size: 13px;
-      font-weight: bold;
-      color: #444;
-      margin-bottom: 8px;
-    }
+.field label {
+  display: block;
+  font-size: 13px;
+  font-weight: bold;
+  color: #444;
+  margin-bottom: 8px;
+}
 
-    .field input {
-      width: 100%;
-      padding: 13px;
-      border: 1px solid #ddd;
-      border-radius: 7px;
-      outline: none;
-      font-size: 14px;
-    }
+.field input {
+  width: 100%;
+  padding: 13px;
+  border: 1px solid #ddd;
+  border-radius: 7px;
+  outline: none;
+  font-size: 14px;
+}
 
-    .field input:focus {
-      border-color: #2864b4;
-    }
+.field input:focus {
+  border-color: #2864b4;
+}
 
-    .password-wrap {
-      display: flex;
-      gap: 8px;
-    }
+.password-wrap {
+  display: flex;
+  gap: 8px;
+}
 
-    .password-wrap input {
-      flex: 1;
-      min-width: 0;
-    }
+.password-wrap input {
+  flex: 1;
+  min-width: 0;
+}
 
-    .show-btn {
-      border: 1px solid #ddd;
-      background: #f7f7f7;
-      border-radius: 7px;
-      padding: 0 12px;
-      cursor: pointer;
-    }
+.show-btn {
+  border: 1px solid #ddd;
+  background: #f7f7f7;
+  border-radius: 7px;
+  padding: 0 12px;
+  cursor: pointer;
+}
 
-    .remember {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 13px;
-      color: #555;
-      margin-bottom: 20px;
-    }
+.remember {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #555;
+  margin-bottom: 20px;
+}
 
-    .login-btn {
-      width: 100%;
-      padding: 14px;
-      border: none;
-      border-radius: 7px;
-      background: #183153;
-      color: white;
-      font-size: 15px;
-      font-weight: bold;
-      cursor: pointer;
-    }
+.login-btn {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 7px;
+  background: #183153;
+  color: white;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+}
 
-    .login-btn:disabled {
-      opacity: .6;
-      cursor: not-allowed;
-    }
+.login-btn:disabled {
+  opacity: .6;
+  cursor: not-allowed;
+}
 
-    .message {
-      margin-top: 15px;
-      font-size: 13px;
-      text-align: center;
-      color: #d32f2f;
-      min-height: 18px;
-    }
+.message {
+  margin-top: 15px;
+  font-size: 13px;
+  text-align: center;
+  color: #d32f2f;
+  min-height: 18px;
+}
 
-    .footer {
-      text-align: center;
-      color: #999;
-      font-size: 11px;
-      margin-top: 25px;
-    }
+.footer {
+  text-align: center;
+  color: #999;
+  font-size: 11px;
+  margin-top: 25px;
+}
 
-    /* LICENSE MODAL */
+/* LICENSE MODAL */
 
-    .modal {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,.6);
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      z-index: 9999;
-    }
+.modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.6);
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 9999;
+}
 
-    .modal-box {
-      background: white;
-      width: 100%;
-      max-width: 350px;
-      padding: 25px;
-      border-radius: 12px;
-    }
+.modal-box {
+  background: white;
+  width: 100%;
+  max-width: 350px;
+  padding: 25px;
+  border-radius: 12px;
+}
 
-    .modal-box h3 {
-      color: #183153;
-      margin-bottom: 12px;
-    }
+.modal-box h3 {
+  color: #183153;
+  margin-bottom: 12px;
+}
 
-    .modal-box p {
-      font-size: 13px;
-      color: #666;
-      line-height: 1.5;
-      margin-bottom: 20px;
-    }
+.modal-box p {
+  font-size: 13px;
+  color: #666;
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
 
-    .modal-actions {
-      display: flex;
-      justify-content: flex-end;
-      gap: 10px;
-    }
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
 
-    .modal-actions button {
-      padding: 10px 17px;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-    }
+.modal-actions button {
+  padding: 10px 17px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
 
-    #retryLicense {
-      background: #183153;
-      color: white;
-    }
+#retryLicense {
+  background: #183153;
+  color: white;
+}
 
-    #cancelLicense {
-      background: #eee;
-      color: #333;
-    }
-  </style>
+#cancelLicense {
+  background: #eee;
+  color: #333;
+}
+</style>
 </head>
 
 <body>
 
-  <div class="login-card">
+<div class="login-card">
 
-    <div class="logo">
-      <h1>ACC SYSTEM</h1>
-      <p>Accounting Management System</p>
+  <div class="logo">
+    <h1>ACC SYSTEM</h1>
+    <p>Accounting Management System</p>
+  </div>
+
+  <form id="loginForm">
+
+    <div class="field">
+      <label for="username">Username</label>
+      <input
+        type="text"
+        id="username"
+        placeholder="Enter username"
+        autocomplete="username"
+        required
+      >
     </div>
 
-    <form id="loginForm">
+    <div class="field">
+      <label for="password">Password</label>
 
-      <div class="field">
-        <label for="username">Username</label>
+      <div class="password-wrap">
         <input
-          type="text"
-          id="username"
-          placeholder="Enter username"
-          autocomplete="username"
+          type="password"
+          id="password"
+          placeholder="Enter password"
+          autocomplete="current-password"
           required
         >
+
+        <button type="button" class="show-btn" id="showPassword">
+          Show
+        </button>
       </div>
+    </div>
 
-      <div class="field">
-        <label for="password">Password</label>
+    <label class="remember">
+      <input type="checkbox" id="rememberUsername">
+      Remember username
+    </label>
 
-        <div class="password-wrap">
-          <input
-            type="password"
-            id="password"
-            placeholder="Enter password"
-            autocomplete="current-password"
-            required
-          >
+    <button type="submit" class="login-btn" id="loginButton">
+      Sign In
+    </button>
 
-          <button
-            type="button"
-            class="show-btn"
-            id="showPassword"
-          >
-            Show
-          </button>
-        </div>
-      </div>
+    <div class="message" id="loginMessage"></div>
 
-      <label class="remember">
-        <input type="checkbox" id="rememberUsername">
-        Remember username
-      </label>
+  </form>
 
-      <button type="submit" class="login-btn" id="loginButton">
-        Sign In
-      </button>
+  <div class="footer">
+    ACC System © 2026
+  </div>
 
-      <div class="message" id="loginMessage"></div>
+</div>
 
-    </form>
+<!-- LICENSE MODAL -->
 
-    <div class="footer">
-      ACC System © 2026
+<div class="modal" id="licenseModal">
+
+  <div class="modal-box">
+
+    <h3>License Required</h3>
+
+    <p id="licenseMessage">
+      A valid system license is required.
+      Please check your license file.
+    </p>
+
+    <div class="modal-actions">
+      <button type="button" id="cancelLicense">Cancel</button>
+      <button type="button" id="retryLicense">Retry</button>
     </div>
 
   </div>
 
-  <!-- LICENSE REQUIRED MODAL -->
+</div>
 
-  <div class="modal" id="licenseModal">
+<script type="module">
 
-    <div class="modal-box">
+import {
+  validateLicense,
+  readExcel,
+  getSheet
+} from "./excel.js";
 
-      <h3>License Required</h3>
+// =====================================
+// ELEMENTS
+// =====================================
 
-      <p id="licenseMessage">
-        A valid system license is required.
-        Please check your license file.
-      </p>
+const loginForm = document.getElementById("loginForm");
+const usernameInput = document.getElementById("username");
+const passwordInput = document.getElementById("password");
+const loginButton = document.getElementById("loginButton");
+const loginMessage = document.getElementById("loginMessage");
 
-      <div class="modal-actions">
+const licenseModal = document.getElementById("licenseModal");
+const licenseMessage = document.getElementById("licenseMessage");
 
-        <button type="button" id="cancelLicense">
-          Cancel
-        </button>
+let databaseReady = false;
 
-        <button type="button" id="retryLicense">
-          Retry
-        </button>
+// =====================================
+// REMEMBER USERNAME
+// =====================================
 
-      </div>
+const savedUsername = localStorage.getItem("accsystem_username");
 
-    </div>
+if (savedUsername) {
+  usernameInput.value = savedUsername;
+  document.getElementById("rememberUsername").checked = true;
+}
 
-  </div>
+// =====================================
+// SHOW / HIDE PASSWORD
+// =====================================
 
-  <script type="module">
+document.getElementById("showPassword").onclick = () => {
 
-    import {
-      validateLicense,
-      readExcel,
-      getSheet
-    } from "./excel.js";
+  const isPassword = passwordInput.type === "password";
 
-    // =================================
-    // ELEMENTS
-    // =================================
+  passwordInput.type = isPassword ? "text" : "password";
 
-    const loginForm = document.getElementById("loginForm");
-    const usernameInput = document.getElementById("username");
-    const passwordInput = document.getElementById("password");
-    const loginButton = document.getElementById("loginButton");
-    const loginMessage = document.getElementById("loginMessage");
+  document.getElementById("showPassword").textContent =
+    isPassword ? "Hide" : "Show";
 
-    const licenseModal = document.getElementById("licenseModal");
-    const licenseMessage = document.getElementById("licenseMessage");
+};
 
-    let databaseReady = false;
+// =====================================
+// DATABASE CONNECTION
+// =====================================
 
-    // =================================
-    // REMEMBER USERNAME
-    // =================================
+async function connectDatabase() {
 
-    const savedUsername = localStorage.getItem("accsystem_username");
+  const result = await validateLicense();
 
-    if (savedUsername) {
-      usernameInput.value = savedUsername;
-      document.getElementById("rememberUsername").checked = true;
-    }
+  if (!result.valid) {
+    throw new Error(result.message);
+  }
 
-    // =================================
-    // SHOW / HIDE PASSWORD
-    // =================================
+  await readExcel();
 
-    document.getElementById("showPassword").onclick = () => {
+  databaseReady = true;
+}
 
-      const isPassword = passwordInput.type === "password";
+// =====================================
+// LICENSE MODAL
+// =====================================
 
-      passwordInput.type = isPassword ? "text" : "password";
+function showLicenseModal(error) {
 
-      document.getElementById("showPassword").textContent =
-        isPassword ? "Hide" : "Show";
+  licenseMessage.textContent =
+    error || "A valid system license is required.";
 
+  licenseModal.style.display = "flex";
+}
+
+document.getElementById("retryLicense").onclick = async () => {
+
+  const retryButton = document.getElementById("retryLicense");
+
+  retryButton.disabled = true;
+  retryButton.textContent = "Checking...";
+
+  try {
+
+    await connectDatabase();
+
+    licenseModal.style.display = "none";
+    loginMessage.textContent = "";
+
+    alert("License verified. Please sign in.");
+
+  } catch (error) {
+
+    showLicenseModal(error.message);
+
+  } finally {
+
+    retryButton.disabled = false;
+    retryButton.textContent = "Retry";
+
+  }
+};
+
+document.getElementById("cancelLicense").onclick = () => {
+  licenseModal.style.display = "none";
+};
+
+// =====================================
+// PASSWORD HASH
+// =====================================
+
+async function hashPassword(password) {
+
+  const data = new TextEncoder().encode(password);
+
+  const hashBuffer = await crypto.subtle.digest(
+    "SHA-256",
+    data
+  );
+
+  return Array.from(new Uint8Array(hashBuffer))
+    .map(byte => byte.toString(16).padStart(2, "0"))
+    .join("");
+
+}
+
+// =====================================
+// USER AUTHENTICATION
+// =====================================
+
+async function authenticateUser(username, password) {
+
+  const users = getSheet("Users");
+
+  const user = users.find(row =>
+    String(row.Username).trim().toLowerCase() ===
+    username.trim().toLowerCase()
+  );
+
+  if (!user) {
+    return {
+      success: false,
+      message: "Invalid username or password."
     };
+  }
 
-    // =================================
-    // LICENSE CHECK
-    // =================================
+  const active = String(user.IsActive).toLowerCase();
 
-    async function connectDatabase() {
+  if (active !== "true" && active !== "1") {
+    return {
+      success: false,
+      message: "This account is inactive."
+    };
+  }
 
-      const result = await validateLicense();
+  if (!user.PasswordHash) {
+    return {
+      success: false,
+      message: "This account has no password configured."
+    };
+  }
 
-      if (!result.valid) {
-        throw new Error(result.message);
-      }
+  const enteredHash = await hashPassword(password);
 
-      await readExcel();
+  if (
+    enteredHash.toLowerCase() !==
+    String(user.PasswordHash).trim().toLowerCase()
+  ) {
+    return {
+      success: false,
+      message: "Invalid username or password."
+    };
+  }
 
-      databaseReady = true;
+  return {
+    success: true,
+    user
+  };
+}
 
-    }
+// =====================================
+// GET USER PERMISSIONS
+// =====================================
 
-    function showLicenseModal(error) {
+function getUserPermissions(user) {
 
-      licenseMessage.textContent =
-        error || "A valid system license is required.";
+  const allAccess = getSheet("UserAccess");
 
-      licenseModal.style.display = "flex";
+  return allAccess.filter(row =>
+    String(row.UserID) === String(user.UserID)
+  );
+}
 
-    }
+// =====================================
+// LOGIN FORM
+// =====================================
 
-    document.getElementById("retryLicense").onclick = async () => {
+loginForm.addEventListener("submit", async (event) => {
 
-      const retryButton = document.getElementById("retryLicense");
+  event.preventDefault();
 
-      retryButton.disabled = true;
-      retryButton.textContent = "Checking...";
+  const username = usernameInput.value.trim();
+  const password = passwordInput.value;
+
+  loginMessage.textContent = "";
+  loginButton.disabled = true;
+  loginButton.textContent = "Signing in...";
+
+  try {
+
+    // CONNECT DATABASE
+
+    if (!databaseReady) {
 
       try {
 
         await connectDatabase();
 
-        licenseModal.style.display = "none";
-        loginMessage.textContent = "";
-
-        alert("License verified. Please sign in.");
-
       } catch (error) {
 
         showLicenseModal(error.message);
-
-      } finally {
-
-        retryButton.disabled = false;
-        retryButton.textContent = "Retry";
+        return;
 
       }
+    }
 
-    };
+    // CHECK USER CREDENTIALS
 
-    document.getElementById("cancelLicense").onclick = () => {
-      licenseModal.style.display = "none";
-    };
+    const result = await authenticateUser(username, password);
 
-    // =================================
-    // PASSWORD HASH
-    // =================================
+    if (!result.success) {
+      loginMessage.textContent = result.message;
+      return;
+    }
 
-    async function hashPassword(password) {
+    // GET USER PERMISSIONS
 
-      const data = new TextEncoder().encode(password);
+    const userAccess = getUserPermissions(result.user);
 
-      const hashBuffer = await crypto.subtle.digest(
-        "SHA-256",
-        data
-      );
+    // REMEMBER USERNAME
 
-      return Array.from(new Uint8Array(hashBuffer))
-        .map(byte => byte.toString(16).padStart(2, "0"))
-        .join("");
+    if (document.getElementById("rememberUsername").checked) {
+
+      localStorage.setItem("accsystem_username", username);
+
+    } else {
+
+      localStorage.removeItem("accsystem_username");
 
     }
 
-    // =================================
-    // USER AUTHENTICATION
-    // =================================
+    // CREATE SESSION
 
-    async function authenticateUser(username, password) {
+    sessionStorage.setItem(
+      "accsystem_session",
+      JSON.stringify({
 
-      const users = getSheet("Users");
+        UserID: result.user.UserID,
+        Username: result.user.Username,
+        DisplayName: result.user.DisplayName,
+        Role: result.user.Role,
+        Access: userAccess
 
-      const user = users.find(row =>
-        String(row.Username).trim().toLowerCase() ===
-        username.trim().toLowerCase()
-      );
+      })
+    );
 
-      if (!user) {
-        return {
-          success: false,
-          message: "Invalid username or password."
-        };
-      }
+    // REDIRECT
 
-      const active = String(user.IsActive).toLowerCase();
+    window.location.href = "dashboard.html";
 
-      if (active !== "true" && active !== "1") {
-        return {
-          success: false,
-          message: "This account is inactive."
-        };
-      }
+  } catch (error) {
 
-      if (!user.PasswordHash) {
-        return {
-          success: false,
-          message: "This account has no password configured."
-        };
-      }
+    loginMessage.textContent = error.message;
 
-      const enteredHash = await hashPassword(password);
+  } finally {
 
-      if (
-        enteredHash.toLowerCase() !==
-        String(user.PasswordHash).trim().toLowerCase()
-      ) {
-        return {
-          success: false,
-          message: "Invalid username or password."
-        };
-      }
+    loginButton.disabled = false;
+    loginButton.textContent = "Sign In";
 
-      return {
-        success: true,
-        user
-      };
+  }
 
-    }
+});
 
-    // =================================
-    // LOGIN FORM
-    // =================================
-
-    loginForm.addEventListener("submit", async (event) => {
-
-      event.preventDefault();
-
-      const username = usernameInput.value.trim();
-      const password = passwordInput.value;
-
-      loginMessage.textContent = "";
-      loginButton.disabled = true;
-      loginButton.textContent = "Signing in...";
-
-      try {
-
-        // Load license and private database
-        if (!databaseReady) {
-
-          try {
-
-            await connectDatabase();
-
-          } catch (error) {
-
-            showLicenseModal(error.message);
-            return;
-
-          }
-
-        }
-
-        // Authenticate user
-        const result = await authenticateUser(username, password);
-
-        if (!result.success) {
-          loginMessage.textContent = result.message;
-          return;
-        }
-
-        // Remember username
-        if (document.getElementById("rememberUsername").checked) {
-          localStorage.setItem("accsystem_username", username);
-        } else {
-          localStorage.removeItem("accsystem_username");
-        }
-
-        // Create temporary browser session
-        sessionStorage.setItem(
-          "accsystem_session",
-          JSON.stringify({
-            UserID: result.user.UserID,
-            Username: result.user.Username,
-            DisplayName: result.user.DisplayName,
-            Role: result.user.Role
-          })
-        );
-
-        // Go to dashboard
-        window.location.href = "dashboard.html";
-
-      } catch (error) {
-
-        loginMessage.textContent = error.message;
-
-      } finally {
-
-        loginButton.disabled = false;
-        loginButton.textContent = "Sign In";
-
-      }
-
-    });
-
-  </script>
+</script>
 
 </body>
 </html>
