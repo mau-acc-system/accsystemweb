@@ -1,0 +1,499 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard | ACC System</title>
+
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  background: #f4f6fa;
+  color: #263449;
+}
+
+.app {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* SIDEBAR */
+
+.sidebar {
+  width: 250px;
+  background: #172f50;
+  color: white;
+  padding: 25px 15px;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+
+.brand {
+  font-size: 23px;
+  font-weight: bold;
+  padding: 0 12px 35px;
+}
+
+.menu-label {
+  color: #91a5bf;
+  font-size: 11px;
+  padding: 12px;
+  letter-spacing: 1px;
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 12px;
+  margin-bottom: 5px;
+  border-radius: 7px;
+  color: #c6d3e3;
+  text-decoration: none;
+  font-size: 14px;
+  cursor: pointer;
+  transition: .2s;
+}
+
+.nav-link:hover,
+.nav-link.active {
+  background: #294b73;
+  color: white;
+}
+
+.nav-icon {
+  width: 22px;
+  text-align: center;
+  font-size: 17px;
+}
+
+.sidebar-bottom {
+  margin-top: auto;
+  padding-top: 25px;
+}
+
+.logout {
+  width: 100%;
+  border: none;
+  background: #294b73;
+  color: white;
+  padding: 13px;
+  border-radius: 7px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+/* MAIN */
+
+.main {
+  flex: 1;
+  min-width: 0;
+}
+
+.topbar {
+  height: 75px;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 30px;
+  border-bottom: 1px solid #e8ecf2;
+}
+
+.topbar h2 {
+  font-size: 18px;
+  color: #263c59;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+}
+
+.avatar {
+  width: 38px;
+  height: 38px;
+  background: #e5edf8;
+  color: #172f50;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-weight: bold;
+}
+
+.content {
+  padding: 30px;
+}
+
+.welcome {
+  margin-bottom: 28px;
+}
+
+.welcome h1 {
+  font-size: 25px;
+  color: #172f50;
+  margin-bottom: 8px;
+}
+
+.welcome p {
+  color: #8490a0;
+  font-size: 14px;
+}
+
+/* CARDS */
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+  margin-bottom: 25px;
+}
+
+.stat-card {
+  background: white;
+  border: 1px solid #e9edf3;
+  border-radius: 10px;
+  padding: 22px;
+}
+
+.stat-card .label {
+  color: #8490a0;
+  font-size: 13px;
+  margin-bottom: 15px;
+}
+
+.stat-card .value {
+  color: #172f50;
+  font-size: 25px;
+  font-weight: bold;
+}
+
+.stat-icon {
+  font-size: 20px;
+  margin-bottom: 12px;
+}
+
+/* LOWER SECTION */
+
+.lower-grid {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 20px;
+}
+
+.panel {
+  background: white;
+  border: 1px solid #e9edf3;
+  border-radius: 10px;
+  padding: 22px;
+  min-height: 230px;
+}
+
+.panel h3 {
+  color: #263c59;
+  font-size: 16px;
+  margin-bottom: 20px;
+}
+
+.empty {
+  color: #a0a9b6;
+  font-size: 13px;
+  text-align: center;
+  padding: 45px 10px;
+}
+
+.menu-toggle {
+  display: none;
+  border: none;
+  background: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #172f50;
+}
+
+/* RESPONSIVE */
+
+@media(max-width: 1000px) {
+  .stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media(max-width: 700px) {
+  .sidebar {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: -260px;
+    z-index: 100;
+    transition: .25s;
+    overflow-y: auto;
+  }
+
+  .sidebar.open {
+    left: 0;
+  }
+
+  .menu-toggle {
+    display: block;
+  }
+
+  .topbar {
+    padding: 0 15px;
+    height: 65px;
+  }
+
+  .content {
+    padding: 20px 15px;
+  }
+
+  .lower-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .welcome h1 {
+    font-size: 21px;
+  }
+
+  .stat-card {
+    padding: 16px;
+  }
+
+  .stat-card .value {
+    font-size: 20px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <!-- SIDEBAR -->
+
+  <aside class="sidebar" id="sidebar">
+
+    <div class="brand">ACC SYSTEM</div>
+
+    <div class="menu-label">MAIN MENU</div>
+
+    <a class="nav-link active" href="dashboard.html">
+      <span class="nav-icon">▦</span>
+      Dashboard
+    </a>
+
+    <div class="menu-label">TRANSACTIONS</div>
+
+    <a class="nav-link" href="modules/banks.html">
+      <span class="nav-icon">▤</span>
+      Banks
+    </a>
+
+    <a class="nav-link" href="modules/cash.html">
+      <span class="nav-icon">◉</span>
+      Cash
+    </a>
+
+    <a class="nav-link" href="modules/accounts-receivable.html">
+      <span class="nav-icon">↙</span>
+      Accounts Receivable
+    </a>
+
+    <a class="nav-link" href="modules/accounts-payable.html">
+      <span class="nav-icon">↗</span>
+      Accounts Payable
+    </a>
+
+    <a class="nav-link" href="modules/general-ledger.html">
+      <span class="nav-icon">▥</span>
+      General Ledger
+    </a>
+
+    <a class="nav-link" href="modules/inventory.html">
+      <span class="nav-icon">▣</span>
+      Inventory
+    </a>
+
+    <div class="menu-label">MANAGEMENT</div>
+
+    <a class="nav-link" href="reports/financial-reports.html">
+      <span class="nav-icon">▧</span>
+      Reports
+    </a>
+
+    <a class="nav-link" href="setup/company-setup.html">
+      <span class="nav-icon">⚙</span>
+      Company Setup
+    </a>
+
+    <a class="nav-link" href="setup/user-access.html">
+      <span class="nav-icon">♙</span>
+      User Access
+    </a>
+
+    <div class="sidebar-bottom">
+      <button class="logout" id="logoutButton">
+        ↪ Sign Out
+      </button>
+    </div>
+
+  </aside>
+
+  <!-- MAIN CONTENT -->
+
+  <main class="main">
+
+    <header class="topbar">
+
+      <div style="display:flex;align-items:center;gap:15px;">
+        <button class="menu-toggle" id="menuToggle">☰</button>
+        <h2>Dashboard</h2>
+      </div>
+
+      <div class="user-info">
+        <div>
+          <strong id="displayName">Administrator</strong>
+          <div id="userRole" style="color:#8995a5;margin-top:3px;">
+            Administrator
+          </div>
+        </div>
+
+        <div class="avatar" id="avatar">A</div>
+      </div>
+
+    </header>
+
+    <section class="content">
+
+      <div class="welcome">
+        <h1 id="welcomeMessage">Welcome back!</h1>
+        <p>Here's an overview of your accounting system.</p>
+      </div>
+
+      <!-- SUMMARY CARDS -->
+
+      <div class="stats">
+
+        <div class="stat-card">
+          <div class="stat-icon">🏦</div>
+          <div class="label">Total Cash</div>
+          <div class="value">₱0.00</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">📥</div>
+          <div class="label">Accounts Receivable</div>
+          <div class="value">₱0.00</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">📤</div>
+          <div class="label">Accounts Payable</div>
+          <div class="value">₱0.00</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">📦</div>
+          <div class="label">Inventory Items</div>
+          <div class="value">0</div>
+        </div>
+
+      </div>
+
+      <!-- LOWER PANELS -->
+
+      <div class="lower-grid">
+
+        <div class="panel">
+          <h3>Recent Activities</h3>
+          <div class="empty">
+            No activities recorded yet.
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3>System Information</h3>
+
+          <div style="font-size:13px;line-height:2.2;color:#758296;">
+            <div>System: <strong>ACC System</strong></div>
+            <div>Version: <strong>1.0.0</strong></div>
+            <div>Database: <strong>Excel Database</strong></div>
+            <div>Status: <strong style="color:#21976b;">Connected</strong></div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+</div>
+
+<script>
+
+// =====================================
+// SESSION CHECK
+// =====================================
+
+const session = sessionStorage.getItem("accsystem_session");
+
+if (!session) {
+  window.location.replace("login.html");
+} else {
+
+  const user = JSON.parse(session);
+
+  const name = user.DisplayName || user.Username || "User";
+  const role = user.Role || "User";
+
+  document.getElementById("displayName").textContent = name;
+  document.getElementById("userRole").textContent = role;
+  document.getElementById("welcomeMessage").textContent =
+    "Welcome back, " + name + "!";
+
+  document.getElementById("avatar").textContent =
+    name.charAt(0).toUpperCase();
+
+}
+
+// =====================================
+// MOBILE SIDEBAR
+// =====================================
+
+document.getElementById("menuToggle").onclick = () => {
+  document.getElementById("sidebar").classList.toggle("open");
+};
+
+// =====================================
+// LOGOUT
+// =====================================
+
+document.getElementById("logoutButton").onclick = () => {
+
+  if (confirm("Are you sure you want to sign out?")) {
+
+    sessionStorage.removeItem("accsystem_session");
+
+    window.location.replace("login.html");
+
+  }
+
+};
+
+</script>
+
+</body>
+</html>
