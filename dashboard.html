@@ -4,588 +4,905 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard | ACC System</title>
+<title>ACC System | Dashboard</title>
 
 <style>
+:root {
+    --navy: #101b35;
+    --navy2: #172544;
+    --blue: #315efb;
+    --bg: #f4f6fa;
+    --white: #ffffff;
+    --text: #202b3c;
+    --muted: #8993a5;
+    --border: #e8ecf2;
+    --sidebar-width: 265px;
+    --header-height: 68px;
+}
+
 * {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: Arial, sans-serif;
+    box-sizing: border-box;
 }
 
 body {
-  background: #f4f6fa;
-  color: #263449;
-}
-
-.app {
-  display: flex;
-  min-height: 100vh;
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    overflow: hidden;
 }
 
 /* SIDEBAR */
-
 .sidebar {
-  width: 250px;
-  background: #172f50;
-  color: white;
-  padding: 25px 15px;
-  display: flex;
-  flex-direction: column;
-  flex-shrink: 0;
-  transition: .25s;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: var(--sidebar-width);
+    background: var(--navy);
+    color: white;
+    display: flex;
+    flex-direction: column;
+    z-index: 100;
 }
 
 .brand {
-  font-size: 23px;
-  font-weight: bold;
-  padding: 0 12px 35px;
+    height: var(--header-height);
+    min-height: var(--header-height);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0 22px;
+    border-bottom: 1px solid rgba(255,255,255,.08);
+}
+
+.brand-logo {
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
+    background: var(--blue);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 17px;
+}
+
+.brand-name {
+    font-size: 16px;
+    font-weight: bold;
+    letter-spacing: .5px;
+}
+
+.sidebar-scroll {
+    flex: 1;
+    overflow-y: auto;
+    padding: 15px 12px 25px;
 }
 
 .menu-label {
-  color: #91a5bf;
-  font-size: 11px;
-  padding: 12px;
-  letter-spacing: 1px;
+    color: #8290aa;
+    font-size: 10px;
+    font-weight: bold;
+    letter-spacing: 1.2px;
+    padding: 15px 12px 8px;
 }
 
-.nav-link {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 13px 12px;
-  margin-bottom: 5px;
-  border-radius: 7px;
-  color: #c6d3e3;
-  text-decoration: none;
-  font-size: 14px;
-  cursor: pointer;
-  transition: .2s;
+.menu-item,
+.task-item {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 11px 12px;
+    color: #c4cee0;
+    text-decoration: none;
+    border: 0;
+    border-radius: 7px;
+    background: transparent;
+    cursor: pointer;
+    font-size: 13px;
+    text-align: left;
+    transition: .15s;
 }
 
-.nav-link:hover,
-.nav-link.active {
-  background: #294b73;
-  color: white;
+.menu-item:hover,
+.task-item:hover {
+    background: rgba(255,255,255,.08);
+    color: white;
 }
 
-.nav-icon {
-  width: 22px;
-  text-align: center;
-  font-size: 17px;
+.menu-item.active,
+.task-item.active {
+    background: var(--blue);
+    color: white;
 }
 
-.sidebar-bottom {
-  margin-top: auto;
-  padding-top: 25px;
+.menu-icon {
+    width: 19px;
+    text-align: center;
+    font-size: 15px;
 }
 
-.logout {
-  width: 100%;
-  border: none;
-  background: #294b73;
-  color: white;
-  padding: 13px;
-  border-radius: 7px;
-  cursor: pointer;
-  font-size: 14px;
+.menu-arrow {
+    margin-left: auto;
+    font-size: 11px;
+    transition: transform .2s;
 }
 
-.logout:hover {
-  background: #385f8b;
+.menu-group.open > .menu-item .menu-arrow {
+    transform: rotate(90deg);
 }
 
-/* MAIN */
+.submenu {
+    display: none;
+    padding: 4px 0 5px 17px;
+}
 
+.menu-group.open > .submenu {
+    display: block;
+}
+
+.task-item {
+    padding: 9px 10px;
+    font-size: 12px;
+    gap: 8px;
+}
+
+.task-item .task-icon {
+    width: 17px;
+    text-align: center;
+    opacity: .85;
+}
+
+.favorite-star {
+    margin-left: auto;
+    color: #f5c451;
+    font-size: 16px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 2px 4px;
+    border: 0;
+    background: transparent;
+}
+
+.favorite-star:hover {
+    transform: scale(1.15);
+}
+
+.favorite-empty {
+    color: #8290aa;
+    font-size: 11px;
+    padding: 8px 12px 12px;
+}
+
+/* MAIN AREA */
 .main {
-  flex: 1;
-  min-width: 0;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: var(--sidebar-width);
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
 }
 
-.topbar {
-  height: 75px;
-  background: white;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 30px;
-  border-bottom: 1px solid #e8ecf2;
+/* FIXED HEADER */
+.header {
+    height: var(--header-height);
+    min-height: var(--header-height);
+    background: white;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 25px;
+    z-index: 50;
 }
 
-.topbar h2 {
-  font-size: 18px;
-  color: #263c59;
+.header-title {
+    font-size: 17px;
+    font-weight: bold;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
 }
 
 .user-info {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-size: 13px;
+    text-align: right;
+}
+
+.user-name {
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.user-role {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 3px;
 }
 
 .avatar {
-  width: 38px;
-  height: 38px;
-  background: #e5edf8;
-  color: #172f50;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  font-weight: bold;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #e9efff;
+    color: var(--blue);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 13px;
 }
 
-.content {
-  padding: 30px;
+.logout {
+    border: 1px solid var(--border);
+    background: white;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    color: #596579;
+    font-size: 12px;
+}
+
+.logout:hover {
+    background: #fff0f0;
+    color: #d33;
+}
+
+/* SCROLLABLE CONTENT */
+.content-area {
+    flex: 1;
+    min-height: 0;
+    overflow: auto;
+    background: var(--bg);
+}
+
+#contentFrame {
+    width: 100%;
+    height: 100%;
+    min-height: 100%;
+    display: block;
+    border: 0;
+    background: var(--bg);
+}
+
+.dashboard-content {
+    padding: 28px;
 }
 
 .welcome {
-  margin-bottom: 28px;
+    margin-bottom: 25px;
 }
 
-.welcome h1 {
-  font-size: 25px;
-  color: #172f50;
-  margin-bottom: 8px;
+.welcome h2 {
+    margin: 0 0 7px;
+    font-size: 23px;
 }
 
 .welcome p {
-  color: #8490a0;
-  font-size: 14px;
+    margin: 0;
+    color: var(--muted);
+    font-size: 13px;
 }
 
-/* SUMMARY CARDS */
-
-.stats {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 18px;
-  margin-bottom: 25px;
+.cards {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(150px, 1fr));
+    gap: 17px;
 }
 
-.stat-card {
-  background: white;
-  border: 1px solid #e9edf3;
-  border-radius: 10px;
-  padding: 22px;
+.card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
 }
 
-.stat-card .label {
-  color: #8490a0;
-  font-size: 13px;
-  margin-bottom: 15px;
+.card-label {
+    color: var(--muted);
+    font-size: 12px;
 }
 
-.stat-card .value {
-  color: #172f50;
-  font-size: 25px;
-  font-weight: bold;
+.card-value {
+    font-size: 25px;
+    font-weight: bold;
+    margin-top: 12px;
 }
 
-.stat-icon {
-  font-size: 20px;
-  margin-bottom: 12px;
+.card-note {
+    color: #9aa3b2;
+    font-size: 11px;
+    margin-top: 7px;
 }
 
-/* LOWER SECTION */
-
-.lower-grid {
-  display: grid;
-  grid-template-columns: 1.5fr 1fr;
-  gap: 20px;
+.placeholder {
+    margin-top: 22px;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 22px;
 }
 
-.panel {
-  background: white;
-  border: 1px solid #e9edf3;
-  border-radius: 10px;
-  padding: 22px;
-  min-height: 230px;
+.placeholder h3 {
+    margin: 0 0 10px;
+    font-size: 15px;
 }
 
-.panel h3 {
-  color: #263c59;
-  font-size: 16px;
-  margin-bottom: 20px;
+.placeholder p {
+    color: var(--muted);
+    font-size: 13px;
+    margin: 0;
 }
 
-.empty {
-  color: #a0a9b6;
-  font-size: 13px;
-  text-align: center;
-  padding: 45px 10px;
+@media(max-width: 900px) {
+    :root {
+        --sidebar-width: 220px;
+    }
+
+    .cards {
+        grid-template-columns: repeat(2, minmax(130px, 1fr));
+    }
 }
 
-.menu-toggle {
-  display: none;
-  border: none;
-  background: none;
-  font-size: 24px;
-  cursor: pointer;
-  color: #172f50;
-}
+@media(max-width: 600px) {
+    :root {
+        --sidebar-width: 185px;
+        --header-height: 60px;
+    }
 
-.no-access {
-  display: none;
-}
+    .brand {
+        padding: 0 12px;
+    }
 
-/* RESPONSIVE */
+    .brand-name {
+        font-size: 13px;
+    }
 
-@media(max-width: 1000px) {
-  .stats {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
+    .header {
+        padding: 0 12px;
+    }
 
-@media(max-width: 700px) {
-  .sidebar {
-    position: fixed;
-    top: 0;
-    bottom: 0;
-    left: -260px;
-    z-index: 100;
-    overflow-y: auto;
-  }
+    .header-title {
+        font-size: 14px;
+    }
 
-  .sidebar.open {
-    left: 0;
-  }
+    .user-role {
+        display: none;
+    }
 
-  .menu-toggle {
-    display: block;
-  }
+    .logout {
+        padding: 7px;
+    }
 
-  .topbar {
-    padding: 0 15px;
-    height: 65px;
-  }
+    .dashboard-content {
+        padding: 17px;
+    }
 
-  .content {
-    padding: 20px 15px;
-  }
-
-  .lower-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .welcome h1 {
-    font-size: 21px;
-  }
-
-  .stat-card {
-    padding: 16px;
-  }
-
-  .stat-card .value {
-    font-size: 20px;
-  }
+    .cards {
+        grid-template-columns: 1fr;
+    }
 }
 </style>
 </head>
 
 <body>
 
-<div class="app">
+<aside class="sidebar">
 
-  <!-- SIDEBAR -->
-
-  <aside class="sidebar" id="sidebar">
-
-    <div class="brand">ACC SYSTEM</div>
-
-    <div class="menu-label">MAIN MENU</div>
-
-    <a class="nav-link active"
-       data-module="Dashboard"
-       href="dashboard.html">
-      <span class="nav-icon">▦</span>
-      Dashboard
-    </a>
-
-    <div class="menu-label">TRANSACTIONS</div>
-
-    <a class="nav-link"
-       data-module="Banks"
-       href="modules/banks.html">
-      <span class="nav-icon">▤</span>
-      Banks
-    </a>
-
-    <a class="nav-link"
-       data-module="Cash"
-       href="modules/cash.html">
-      <span class="nav-icon">◉</span>
-      Cash
-    </a>
-
-    <a class="nav-link"
-       data-module="Accounts Receivable"
-       href="modules/accounts-receivable.html">
-      <span class="nav-icon">↙</span>
-      Accounts Receivable
-    </a>
-
-    <a class="nav-link"
-       data-module="Accounts Payable"
-       href="modules/accounts-payable.html">
-      <span class="nav-icon">↗</span>
-      Accounts Payable
-    </a>
-
-    <a class="nav-link"
-       data-module="General Ledger"
-       href="modules/general-ledger.html">
-      <span class="nav-icon">▥</span>
-      General Ledger
-    </a>
-
-    <a class="nav-link"
-       data-module="Inventory"
-       href="modules/inventory.html">
-      <span class="nav-icon">▣</span>
-      Inventory
-    </a>
-
-    <div class="menu-label">MANAGEMENT</div>
-
-    <a class="nav-link"
-       data-module="Reports"
-       href="reports/financial-reports.html">
-      <span class="nav-icon">▧</span>
-      Reports
-    </a>
-
-    <a class="nav-link"
-       data-module="Setup"
-       href="setup/company-setup.html">
-      <span class="nav-icon">⚙</span>
-      Company Setup
-    </a>
-
-    <a class="nav-link"
-       data-module="Setup"
-       href="setup/user-access.html">
-      <span class="nav-icon">♙</span>
-      User Access
-    </a>
-
-    <div class="sidebar-bottom">
-      <button class="logout" id="logoutButton">
-        ↪ Sign Out
-      </button>
+    <div class="brand">
+        <div class="brand-logo">A</div>
+        <div class="brand-name">ACC SYSTEM</div>
     </div>
 
-  </aside>
+    <div class="sidebar-scroll">
 
-  <!-- MAIN CONTENT -->
+        <div class="menu-label">QUICK ACCESS</div>
 
-  <main class="main">
-
-    <header class="topbar">
-
-      <div style="display:flex;align-items:center;gap:15px;">
-        <button class="menu-toggle" id="menuToggle">☰</button>
-        <h2>Dashboard</h2>
-      </div>
-
-      <div class="user-info">
-        <div>
-          <strong id="displayName">User</strong>
-          <div id="userRole"
-               style="color:#8995a5;margin-top:3px;">
-            User
-          </div>
+        <div class="menu-group" id="favoritesGroup">
+            <button class="menu-item" onclick="toggleGroup('favoritesGroup')">
+                <span class="menu-icon">★</span>
+                <span>Favorites</span>
+                <span class="menu-arrow">›</span>
+            </button>
+            <div class="submenu" id="favoritesList">
+                <div class="favorite-empty">No favorites yet.</div>
+            </div>
         </div>
 
-        <div class="avatar" id="avatar">U</div>
-      </div>
+        <div class="menu-label">WORKSPACE</div>
 
+        <a class="menu-item active" href="dashboard.html" target="contentFrame"
+           onclick="setActive(this, 'Dashboard')">
+            <span class="menu-icon">⌂</span>
+            <span>Dashboard</span>
+        </a>
+
+        <div class="menu-label">MODULES</div>
+
+        <div id="moduleMenus">
+
+            <div class="menu-group" data-module="Banks">
+                <button class="menu-item" onclick="toggleGroup(this.parentElement)">
+                    <span class="menu-icon">▣</span>
+                    <span>Banks</span>
+                    <span class="menu-arrow">›</span>
+                </button>
+                <div class="submenu">
+                    <a class="task-item" href="modules/banks.html" target="contentFrame"
+                       data-task="Bank Accounts" onclick="openTask(this)">
+                        <span class="task-icon">•</span><span>Bank Accounts</span>
+                        <button class="favorite-star" onclick="toggleFavorite(event,this)" title="Add to Favorites">☆</button>
+                    </a>
+                    <a class="task-item" href="modules/bank-reconciliation.html" target="contentFrame"
+                       data-task="Bank Reconciliation" onclick="openTask(this)">
+                        <span class="task-icon">•</span><span>Bank Reconciliation</span>
+                        <button class="favorite-star" onclick="toggleFavorite(event,this)" title="Add to Favorites">☆</button>
+                    </a>
+                </div>
+            </div>
+
+            <div class="menu-group" data-module="Cash">
+                <button class="menu-item" onclick="toggleGroup(this.parentElement)">
+                    <span class="menu-icon">▤</span>
+                    <span>Cash</span>
+                    <span class="menu-arrow">›</span>
+                </button>
+                <div class="submenu">
+                    <a class="task-item" href="modules/cash-receipts.html" target="contentFrame"
+                       data-task="Cash Receipts" onclick="openTask(this)">
+                        <span class="task-icon">•</span><span>Cash Receipts</span>
+                        <button class="favorite-star" onclick="toggleFavorite(event,this)">☆</button>
+                    </a>
+                    <a class="task-item" href="modules/cash-disbursements.html" target="contentFrame"
+                       data-task="Cash Disbursements" onclick="openTask(this)">
+                        <span class="task-icon">•</span><span>Cash Disbursements</span>
+                        <button class="favorite-star" onclick="toggleFavorite(event,this)">☆</button>
+                    </a>
+                </div>
+            </div>
+
+            <div class="menu-group" data-module="Accounts Receivable">
+                <button class="menu-item" onclick="toggleGroup(this.parentElement)">
+                    <span class="menu-icon">⇧</span>
+                    <span>Accounts Receivable</span>
+                    <span class="menu-arrow">›</span>
+                </button>
+                <div class="submenu">
+                    <a class="task-item" href="modules/customers.html" target="contentFrame"
+                       data-task="Customers" onclick="openTask(this)">
+                        <span class="task-icon">•</span><span>Customers</span>
+                        <button class="favorite-star" onclick="toggleFavorite(event,this)">☆</button>
+                    </a>
+                    <a class="task-item" href="modules/sales-invoices.html" target="contentFrame"
+                       data-task="Sales Invoices" onclick="openTask(this)">
+                        <span class="task-icon">•</span><span>Sales Invoices</span>
+                        <button class="favorite-star" onclick="toggleFavorite(event,this)">☆</button>
+                    </a>
+                    <a class="task-item" href="modules/collections.html" target="contentFrame"
+                       data-task="Collections" onclick="openTask(this)">
+                        <span class="task-icon">•</span><span>Collections</span>
+                        <button class="favorite-star" onclick="toggleFavorite(event,this)">☆</button>
+                    </a>
+                </div>
+            </div>
+
+            <div class="menu-group" data-module="Accounts Payable">
+                <button class="menu-item" onclick="toggleGroup(this.parentElement)">
+                    <span class="menu-icon">⇩</span>
+                    <span>Accounts Payable</span>
+                    <span class="menu-arrow">›</span>
+                </button>
+                <div class="submenu">
+                    <a class="task-item" href="modules/vendors.html" target="contentFrame"
+                       data-task="Vendors" onclick="openTask(this)">
+                        <span class="task-icon">•</span><span>Vendors</span>
+                        <button class="favorite-star" onclick="toggleFavorite(event,this)">☆</button>
+                    </a>
+                    <a class="task-item" href="modules/purchase-invoices.html" target="contentFrame"
+                       data-task="Purchase Invoices" onclick="openTask(this)">
+                        <span class="task-icon">•</span><span>Purchase Invoices</span>
+                        <button class="favorite-star" onclick="toggleFavorite(event,this)">☆</button>
+                    </a>
+                    <a class="task-item" href="modules/payments.html" target="contentFrame"
+                       data-task="Payments" onclick="openTask(this)">
+                        <span class="task-icon">•</span><span>Payments</span>
+                        <button class="favorite-star" onclick="toggleFavorite(event,this)">☆</button>
+                    </a>
+                </div>
+            </div>
+
+            <div class="menu-group" data-module="General Ledger">
+                <button class="menu-item" onclick="toggleGroup(this.parentElement)">
+                    <span class="menu-icon">▦</span>
+                    <span>General Ledger</span>
+                    <span class="menu-arrow">›</span>
+                </button>
+                <div class="submenu">
+                    <a class="task-item" href="modules/chart-of-accounts.html" target="contentFrame"
+                       data-task="Chart of Accounts" onclick="openTask(this)">
+                        <span class="task-icon">•</span><span>Chart of Accounts</span>
+                        <button class="favorite-star" onclick="toggleFavorite(event,this)">☆</button>
+                    </a>
+                    <a class="task-item" href="modules/journal-entry.html" target="contentFrame"
+                       data-task="Journal Entry" onclick="openTask(this)">
+                        <span class="task-icon">•</span><span>Journal Entry</span>
+                        <button class="favorite-star" onclick="toggleFavorite(event,this)">☆</button>
+                    </a>
+                    <a class="task-item" href="modules/general-ledger.html" target="contentFrame"
+                       data-task="General Ledger" onclick="openTask(this)">
+                        <span class="task-icon">•</span><span>General Ledger</span>
+                        <button class="favorite-star" onclick="toggleFavorite(event,this)">☆</button>
+                    </a>
+                </div>
+            </div>
+
+            <div class="menu-group" data-module="Inventory">
+                <button class="menu-item" onclick="toggleGroup(this.parentElement)">
+                    <span class="menu-icon">▧</span>
+                    <span>Inventory</span>
+                    <span class="menu-arrow">›</span>
+                </button>
+                <div class="submenu">
+                    <a class="task-item" href="modules/items.html" target="contentFrame"
+                       data-task="Items" onclick="openTask(this)">
+                        <span class="task-icon">•</span><span>Items</span>
+                        <button class="favorite-star" onclick="toggleFavorite(event,this)">☆</button>
+                    </a>
+                    <a class="task-item" href="modules/stock-movement.html" target="contentFrame"
+                       data-task="Stock Movement" onclick="openTask(this)">
+                        <span class="task-icon">•</span><span>Stock Movement</span>
+                        <button class="favorite-star" onclick="toggleFavorite(event,this)">☆</button>
+                    </a>
+                </div>
+            </div>
+
+            <div class="menu-group" data-module="Reports">
+                <button class="menu-item" onclick="toggleGroup(this.parentElement)">
+                    <span class="menu-icon">▥</span>
+                    <span>Reports</span>
+                    <span class="menu-arrow">›</span>
+                </button>
+                <div class="submenu">
+                    <a class="task-item" href="reports/trial-balance.html" target="contentFrame"
+                       data-task="Trial Balance" onclick="openTask(this)">
+                        <span class="task-icon">•</span><span>Trial Balance</span>
+                        <button class="favorite-star" onclick="toggleFavorite(event,this)">☆</button>
+                    </a>
+                    <a class="task-item" href="reports/income-statement.html" target="contentFrame"
+                       data-task="Income Statement" onclick="openTask(this)">
+                        <span class="task-icon">•</span><span>Income Statement</span>
+                        <button class="favorite-star" onclick="toggleFavorite(event,this)">☆</button>
+                    </a>
+                    <a class="task-item" href="reports/balance-sheet.html" target="contentFrame"
+                       data-task="Balance Sheet" onclick="openTask(this)">
+                        <span class="task-icon">•</span><span>Balance Sheet</span>
+                        <button class="favorite-star" onclick="toggleFavorite(event,this)">☆</button>
+                    </a>
+                </div>
+            </div>
+
+            <div class="menu-label">ADMINISTRATION</div>
+
+            <div class="menu-group" data-module="Setup">
+                <button class="menu-item" onclick="toggleGroup(this.parentElement)">
+                    <span class="menu-icon">⚙</span>
+                    <span>Setup</span>
+                    <span class="menu-arrow">›</span>
+                </button>
+                <div class="submenu">
+                    <a class="task-item" href="setup/user-access.html" target="contentFrame"
+                       data-task="User Access" onclick="openTask(this)">
+                        <span class="task-icon">•</span><span>User Access</span>
+                        <button class="favorite-star" onclick="toggleFavorite(event,this)">☆</button>
+                    </a>
+                    <a class="task-item" href="setup/user.html" target="contentFrame"
+                       data-task="Create User" onclick="openTask(this)">
+                        <span class="task-icon">•</span><span>Create User</span>
+                        <button class="favorite-star" onclick="toggleFavorite(event,this)">☆</button>
+                    </a>
+                    <a class="task-item" href="setup/user-update.html" target="contentFrame"
+                       data-task="Update User" onclick="openTask(this)">
+                        <span class="task-icon">•</span><span>Update User</span>
+                        <button class="favorite-star" onclick="toggleFavorite(event,this)">☆</button>
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</aside>
+
+<main class="main">
+
+    <header class="header">
+        <div class="header-title" id="pageTitle">Dashboard</div>
+
+        <div class="header-right">
+            <div class="user-info">
+                <div class="user-name" id="userName">User</div>
+                <div class="user-role" id="userRole">Role</div>
+            </div>
+            <div class="avatar" id="userAvatar">U</div>
+            <button class="logout" onclick="logout()">Logout</button>
+        </div>
     </header>
 
-    <section class="content">
-
-      <div class="welcome">
-        <h1 id="welcomeMessage">Welcome back!</h1>
-        <p>Here's an overview of your accounting system.</p>
-      </div>
-
-      <div class="stats">
-
-        <div class="stat-card">
-          <div class="stat-icon">🏦</div>
-          <div class="label">Total Cash</div>
-          <div class="value">₱0.00</div>
-        </div>
-
-        <div class="stat-card">
-          <div class="stat-icon">📥</div>
-          <div class="label">Accounts Receivable</div>
-          <div class="value">₱0.00</div>
-        </div>
-
-        <div class="stat-card">
-          <div class="stat-icon">📤</div>
-          <div class="label">Accounts Payable</div>
-          <div class="value">₱0.00</div>
-        </div>
-
-        <div class="stat-card">
-          <div class="stat-icon">📦</div>
-          <div class="label">Inventory Items</div>
-          <div class="value">0</div>
-        </div>
-
-      </div>
-
-      <div class="lower-grid">
-
-        <div class="panel">
-          <h3>Recent Activities</h3>
-          <div class="empty">
-            No activities recorded yet.
-          </div>
-        </div>
-
-        <div class="panel">
-          <h3>System Information</h3>
-
-          <div style="font-size:13px;line-height:2.2;color:#758296;">
-            <div>System: <strong>ACC System</strong></div>
-            <div>Version: <strong>1.0.0</strong></div>
-            <div>Database: <strong>Excel Database</strong></div>
-            <div>
-              Status:
-              <strong style="color:#21976b;">Connected</strong>
-            </div>
-          </div>
-
-        </div>
-
-      </div>
-
+    <section class="content-area" id="contentArea">
+        <iframe id="contentFrame" name="contentFrame" src="about:blank"></iframe>
     </section>
 
-  </main>
-
-</div>
+</main>
 
 <script>
+const session = JSON.parse(sessionStorage.getItem("ACC_SESSION") || "null");
 
-// =====================================
-// SESSION CHECK
-// =====================================
-
-const sessionData = sessionStorage.getItem("accsystem_session");
-
-if (!sessionData) {
-
-  window.location.replace("login.html");
-
-} else {
-
-  try {
-
-    const user = JSON.parse(sessionData);
-
-    const name = user.DisplayName || user.Username || "User";
-    const role = user.Role || "User";
-    const accessList = user.Access || [];
-
-    // USER INFORMATION
-
-    document.getElementById("displayName").textContent = name;
-    document.getElementById("userRole").textContent = role;
-
-    document.getElementById("welcomeMessage").textContent =
-      "Welcome back, " + name + "!";
-
-    document.getElementById("avatar").textContent =
-      name.charAt(0).toUpperCase();
-
-    // =================================
-    // USER ACCESS CONTROL
-    // =================================
-
-    const isAdmin = role.toLowerCase() === "administrator";
-
-    document.querySelectorAll("[data-module]").forEach(menu => {
-
-      const moduleName = menu.dataset.module;
-
-      const permission = accessList.find(item =>
-        String(item.Module).trim().toLowerCase() ===
-        moduleName.trim().toLowerCase()
-      );
-
-      const canView = permission &&
-        ["true", "1", "yes"].includes(
-          String(permission.CanView).toLowerCase()
-        );
-
-      if (!isAdmin && !canView) {
-        menu.style.display = "none";
-      }
-
-    });
-
-    // DASHBOARD ACCESS
-
-    const dashboardPermission = accessList.find(item =>
-      String(item.Module).trim().toLowerCase() === "dashboard"
-    );
-
-    const canViewDashboard = isAdmin || (
-      dashboardPermission &&
-      ["true", "1", "yes"].includes(
-        String(dashboardPermission.CanView).toLowerCase()
-      )
-    );
-
-    if (!canViewDashboard) {
-      document.querySelector(".content").innerHTML = `
-        <div class="panel">
-          <h3>Access Denied</h3>
-          <div class="empty">
-            You do not have permission to view the dashboard.
-          </div>
-        </div>
-      `;
-    }
-
-  } catch (error) {
-
-    sessionStorage.removeItem("accsystem_session");
-    window.location.replace("login.html");
-
-  }
-
+if (!session) {
+    window.location.href = "login.html";
 }
 
-// =====================================
-// MOBILE SIDEBAR
-// =====================================
+const currentUser = session || {};
+const userRole = currentUser.Role || "";
+const userAccess = currentUser.Access || [];
 
-document.getElementById("menuToggle").onclick = () => {
-  document.getElementById("sidebar").classList.toggle("open");
-};
+document.getElementById("userName").textContent =
+    currentUser.DisplayName || currentUser.Username || "User";
 
-// =====================================
-// LOGOUT
-// =====================================
+document.getElementById("userRole").textContent = userRole;
 
-document.getElementById("logoutButton").onclick = () => {
+document.getElementById("userAvatar").textContent =
+    (currentUser.DisplayName || currentUser.Username || "U")
+    .trim().charAt(0).toUpperCase();
 
-  if (confirm("Are you sure you want to sign out?")) {
+function logout() {
+    sessionStorage.removeItem("ACC_SESSION");
+    window.location.href = "login.html";
+}
 
-    sessionStorage.removeItem("accsystem_session");
+function toggleGroup(group) {
+    group.classList.toggle("open");
+}
 
-    window.location.replace("login.html");
+function setActive(element, title) {
+    document.querySelectorAll(".task-item, .menu-item").forEach(item => {
+        item.classList.remove("active");
+    });
 
-  }
+    element.classList.add("active");
+    document.getElementById("pageTitle").textContent = title;
+}
 
-};
+function openTask(element) {
+    setActive(element, element.dataset.task || element.textContent.trim());
 
+    const parentGroup = element.closest(".menu-group");
+    if (parentGroup) parentGroup.classList.add("open");
+}
+
+const FAVORITES_KEY = "ACC_FAVORITES";
+
+function getFavorites() {
+    try {
+        return JSON.parse(localStorage.getItem(FAVORITES_KEY) || "[]");
+    } catch {
+        return [];
+    }
+}
+
+function saveFavorites(favorites) {
+    localStorage.setItem(FAVORITES_KEY, JSON.stringify(favorites));
+}
+
+function toggleFavorite(event, button) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const link = button.closest("a");
+    const favorite = {
+        name: link.dataset.task,
+        url: link.getAttribute("href")
+    };
+
+    let favorites = getFavorites();
+    const exists = favorites.some(item => item.url === favorite.url);
+
+    if (exists) {
+        favorites = favorites.filter(item => item.url !== favorite.url);
+    } else {
+        favorites.push(favorite);
+    }
+
+    saveFavorites(favorites);
+    renderFavorites();
+}
+
+function renderFavorites() {
+    const container = document.getElementById("favoritesList");
+    const favorites = getFavorites();
+
+    container.innerHTML = "";
+
+    if (favorites.length === 0) {
+        container.innerHTML = '<div class="favorite-empty">No favorites yet.</div>';
+    } else {
+        favorites.forEach(favorite => {
+            const link = document.createElement("a");
+            link.className = "task-item";
+            link.href = favorite.url;
+            link.target = "contentFrame";
+            link.innerHTML = `
+                <span class="task-icon">★</span>
+                <span></span>
+                <button class="favorite-star" title="Remove favorite">★</button>
+            `;
+
+            link.querySelector("span:nth-child(2)").textContent = favorite.name;
+
+            link.querySelector("button").addEventListener("click", event => {
+                event.preventDefault();
+                event.stopPropagation();
+
+                saveFavorites(
+                    getFavorites().filter(item => item.url !== favorite.url)
+                );
+
+                renderFavorites();
+            });
+
+            link.addEventListener("click", () => {
+                setActive(link, favorite.name);
+            });
+
+            container.appendChild(link);
+        });
+    }
+
+    document.querySelectorAll(".task-item[data-task]").forEach(link => {
+        const button = link.querySelector(".favorite-star");
+        if (!button) return;
+
+        const isFavorite = favorites.some(item => item.url === link.getAttribute("href"));
+        button.textContent = isFavorite ? "★" : "☆";
+    });
+}
+
+/* PERMISSION FILTER */
+function canView(moduleName) {
+    if (userRole.toLowerCase() === "administrator") return true;
+
+    return userAccess.some(row =>
+        String(row.Module).trim() === moduleName &&
+        (row.CanView === true ||
+         String(row.CanView).toLowerCase() === "true" ||
+         String(row.CanView) === "1")
+    );
+}
+
+document.querySelectorAll(".menu-group[data-module]").forEach(group => {
+    const moduleName = group.dataset.module;
+
+    if (!canView(moduleName)) {
+        group.style.display = "none";
+    }
+});
+
+/* DASHBOARD LINK */
+const dashboardLink = document.querySelector(
+    '.menu-item[href="dashboard.html"]'
+);
+
+dashboardLink.addEventListener("click", event => {
+    event.preventDefault();
+    document.getElementById("pageTitle").textContent = "Dashboard";
+    setActive(dashboardLink, "Dashboard");
+    showDashboard();
+});
+
+/* DASHBOARD CONTENT */
+function showDashboard() {
+    const frame = document.getElementById("contentFrame");
+
+    frame.srcdoc = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+    <meta charset="UTF-8">
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            padding: 28px;
+            font-family: Arial, sans-serif;
+            background: #f4f6fa;
+            color: #202b3c;
+        }
+        .welcome { margin-bottom: 25px; }
+        h2 { margin: 0 0 7px; font-size: 23px; }
+        p { margin: 0; color: #8993a5; font-size: 13px; }
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(130px, 1fr));
+            gap: 17px;
+        }
+        .card {
+            background: white;
+            border: 1px solid #e8ecf2;
+            border-radius: 10px;
+            padding: 20px;
+        }
+        .label { color: #8993a5; font-size: 12px; }
+        .value { font-size: 25px; font-weight: bold; margin-top: 12px; }
+        .note { color: #9aa3b2; font-size: 11px; margin-top: 7px; }
+        .panel {
+            margin-top: 22px;
+            background: white;
+            border: 1px solid #e8ecf2;
+            border-radius: 10px;
+            padding: 22px;
+        }
+        .panel h3 { margin: 0 0 10px; font-size: 15px; }
+        @media(max-width: 700px) {
+            .cards { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media(max-width: 450px) {
+            .cards { grid-template-columns: 1fr; }
+        }
+    </style>
+    </head>
+    <body>
+        <div class="welcome">
+            <h2>Welcome, ${escapeHtml(currentUser.DisplayName || currentUser.Username || "User")}!</h2>
+            <p>Here's your ACC System workspace.</p>
+        </div>
+
+        <div class="cards">
+            <div class="card">
+                <div class="label">Total Cash</div>
+                <div class="value">₱0.00</div>
+                <div class="note">Cash balance</div>
+            </div>
+            <div class="card">
+                <div class="label">Accounts Receivable</div>
+                <div class="value">₱0.00</div>
+                <div class="note">Outstanding receivables</div>
+            </div>
+            <div class="card">
+                <div class="label">Accounts Payable</div>
+                <div class="value">₱0.00</div>
+                <div class="note">Outstanding payables</div>
+            </div>
+            <div class="card">
+                <div class="label">Net Income</div>
+                <div class="value">₱0.00</div>
+                <div class="note">Current period</div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <h3>Getting Started</h3>
+            <p>Select a module or task from the sidebar to begin.</p>
+        </div>
+    </body>
+    </html>`;
+}
+
+function escapeHtml(value) {
+    return String(value).replace(/[&<>"']/g, char => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+    })[char]);
+}
+
+renderFavorites();
+showDashboard();
 </script>
 
 </body>
