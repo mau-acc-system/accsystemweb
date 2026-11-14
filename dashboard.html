@@ -640,7 +640,7 @@ body {
 </main>
 
 <script>
-const session = JSON.parse(sessionStorage.getItem("ACC_SESSION") || "null");
+const session = JSON.parse(sessionStorage.getItem("accsystem_session") || "null");
 
 if (!session) {
     window.location.href = "login.html";
