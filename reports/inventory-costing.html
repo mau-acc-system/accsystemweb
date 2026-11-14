@@ -6,6 +6,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Inventory Costing Report | ACC System</title>
 
+<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+
 <style>
 *{box-sizing:border-box}
 body{margin:0;padding:28px;font-family:Arial,Helvetica,sans-serif;background:#f4f6fa;color:#26364e}
@@ -17,7 +19,6 @@ button{cursor:pointer;font-family:inherit}
 .btn{border:0;border-radius:6px;padding:10px 16px;font-size:12px;font-weight:bold}
 .primary{background:#315efb;color:white}
 .secondary{background:white;border:1px solid #dce2eb;color:#536176}
-.btn:disabled{opacity:.5;cursor:not-allowed}
 .filters{display:grid;grid-template-columns:repeat(4,minmax(130px,1fr)) auto;gap:12px;align-items:end;background:white;border:1px solid #e8ecf2;border-radius:10px;padding:18px;margin-bottom:18px}
 .field{display:flex;flex-direction:column;gap:7px}
 label{font-size:11px;font-weight:bold;color:#536176}
@@ -41,17 +42,10 @@ tfoot td{font-weight:bold;background:#f3f5f9;border-top:2px solid #dce2eb}
 .empty{text-align:center!important;padding:35px;color:#8993a5}
 .message{display:none;padding:12px 14px;border-radius:6px;font-size:12px;margin-bottom:16px}
 .message.error{display:block;background:#fff0f0;color:#c03939}
-.message.success{display:block;background:#e8f8ef;color:#16834b}
-.negative{color:#c03939;font-weight:bold}
 .note{font-size:11px;color:#8993a5;line-height:1.6;margin-top:12px}
 @media(max-width:950px){.filters{grid-template-columns:repeat(2,minmax(0,1fr))}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:550px){body{padding:15px}.filters{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.panel{padding:13px}}
-@media print{
-body{padding:0;background:white}
-.heading .actions,.filters,.message{display:none!important}
-.panel,.stat{break-inside:avoid}
-body{color:black}
-}
+@media print{body{padding:0;background:white}.heading .actions,.filters,.message{display:none!important}.panel,.stat{break-inside:avoid}}
 </style>
 </head>
 
@@ -75,24 +69,18 @@ body{color:black}
         <label for="fromDate">FROM DATE</label>
         <input type="date" id="fromDate">
     </div>
-
     <div class="field">
         <label for="toDate">TO DATE</label>
         <input type="date" id="toDate">
     </div>
-
     <div class="field">
         <label for="itemFilter">INVENTORY ITEM</label>
-        <select id="itemFilter">
-            <option value="">All Inventory Items</option>
-        </select>
+        <select id="itemFilter"><option value="">All Inventory Items</option></select>
     </div>
-
     <div class="field">
         <label for="searchInput">SEARCH</label>
         <input type="search" id="searchInput" placeholder="Search item code or name">
     </div>
-
     <button class="btn primary" id="generateButton">Generate Report</button>
 </div>
 
@@ -139,9 +127,7 @@ body{color:black}
                 </tr>
             </thead>
             <tbody id="reportTable">
-                <tr>
-                    <td colspan="11" class="empty">Loading report...</td>
-                </tr>
+                <tr><td colspan="11" class="empty">Loading report...</td></tr>
             </tbody>
             <tfoot id="reportFooter"></tfoot>
         </table>
@@ -160,8 +146,6 @@ import {
     readExcel,
     getSheet
 } from "../excel.js";
-
-/* SESSION AND PERMISSIONS */
 
 const session = JSON.parse(
     sessionStorage.getItem("accsystem_session") || "null"
@@ -191,8 +175,6 @@ if (!canView) {
     throw new Error("Insufficient permissions");
 }
 
-/* ELEMENTS */
-
 const $ = id => document.getElementById(id);
 
 const reportTable = $("reportTable");
@@ -206,8 +188,6 @@ let costingMethod = "FIFO";
 let companyCurrency = "PHP";
 
 const EPSILON = 0.0000001;
-
-/* HELPERS */
 
 function numberValue(value) {
     const n = Number(value);
@@ -263,20 +243,6 @@ function getLocalDate() {
     ).toISOString().slice(0, 10);
 }
 
-function getItem(itemID) {
-    return items.find(item =>
-        String(item.ItemID) === String(itemID)
-    );
-}
-
-function isIncoming(type) {
-    return [
-        "Beginning Balance",
-        "Stock In",
-        "Adjustment In"
-    ].includes(type);
-}
-
 function showError(text) {
     message.textContent = text;
     message.className = "message error";
@@ -309,10 +275,8 @@ function movementOrder(a, b) {
     );
 }
 
-/*
- * Rebuild inventory from transaction history.
- * The report recalculates issue costs using the selected costing method.
- */
+/* INVENTORY COSTING ENGINE */
+
 function createInventoryState() {
     return {
         layers: [],
@@ -367,9 +331,7 @@ function issueInventory(state, quantity, transactionNo) {
         );
     }
 
-    if (quantity <= 0) {
-        return 0;
-    }
+    if (quantity <= 0) return 0;
 
     if (costingMethod === "WA") {
         const averageCost = state.quantity > 0
@@ -413,7 +375,7 @@ function issueInventory(state, quantity, transactionNo) {
     return issueCost;
 }
 
-/* BUILD REPORT FOR ONE ITEM */
+/* BUILD ITEM REPORT */
 
 function buildItemReport(item, fromDate, toDate) {
     const ledger = movements
@@ -493,7 +455,7 @@ function buildItemReport(item, fromDate, toDate) {
     return result;
 }
 
-/* REPORT GENERATION */
+/* GENERATE REPORT */
 
 function generateReport() {
     hideMessage();
@@ -515,7 +477,8 @@ function generateReport() {
 
     try {
         let selectedItems = items.filter(item =>
-            !selectedItem || String(item.ItemID) === String(selectedItem)
+            !selectedItem ||
+            String(item.ItemID) === String(selectedItem)
         );
 
         selectedItems = selectedItems.filter(item => {
@@ -543,7 +506,7 @@ function generateReport() {
     }
 }
 
-/* RENDER REPORT */
+/* RENDER */
 
 function renderReport() {
     reportTable.innerHTML = "";
@@ -627,35 +590,30 @@ function renderReport() {
 
 function updateSummary() {
     const totalQuantity = reportRows.reduce(
-        (sum, row) => sum + row.endingQuantity,
-        0
+        (sum, row) => sum + row.endingQuantity, 0
     );
 
     const totalValue = reportRows.reduce(
-        (sum, row) => sum + row.endingValue,
-        0
+        (sum, row) => sum + row.endingValue, 0
     );
 
     const totalOut = reportRows.reduce(
-        (sum, row) => sum + row.stockOutQuantity,
-        0
+        (sum, row) => sum + row.stockOutQuantity, 0
     );
 
     const totalCOGS = reportRows.reduce(
-        (sum, row) => sum + row.stockOutCost,
-        0
+        (sum, row) => sum + row.stockOutCost, 0
     );
 
     $("totalQuantity").textContent = formatNumber(totalQuantity);
     $("totalValue").textContent =
         companyCurrency + " " + formatMoney(totalValue);
-
     $("totalOut").textContent = formatNumber(totalOut);
     $("totalCOGS").textContent =
         companyCurrency + " " + formatMoney(totalCOGS);
 }
 
-/* CSV EXPORT */
+/* EXPORT CSV */
 
 function exportCSV() {
     if (!reportRows.length) {
@@ -712,7 +670,6 @@ function exportCSV() {
         `Inventory-Costing-${$("fromDate").value}-to-${$("toDate").value}.csv`;
 
     link.click();
-
     URL.revokeObjectURL(url);
 }
 
@@ -737,6 +694,10 @@ function populateItems() {
 
 async function initialize() {
     try {
+        if (typeof window.XLSX === "undefined") {
+            throw new Error("SheetJS library is not loaded. Check your internet connection.");
+        }
+
         const license = await validateLicense();
 
         if (!license.valid) {
@@ -796,10 +757,8 @@ async function initialize() {
 /* EVENTS */
 
 $("generateButton").addEventListener("click", generateReport);
-
 $("searchInput").addEventListener("input", generateReport);
 $("itemFilter").addEventListener("change", generateReport);
-
 $("exportButton").addEventListener("click", exportCSV);
 
 $("printButton").addEventListener("click", () => {
