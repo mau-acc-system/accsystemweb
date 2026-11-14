@@ -10,7 +10,7 @@ const CONFIG = {
   file: "Excel-Database.xlsx"
 };
 
-const LICENSE_FILE = "./license.tk";
+const LICENSE_FILE = new URL("./license.tk", import.meta.url).href;
 
 const API_URL =
   `https://api.github.com/repos/${CONFIG.owner}/${CONFIG.repo}/contents/${encodeURIComponent(CONFIG.file)}`;
