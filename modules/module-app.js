@@ -129,34 +129,50 @@ function checkDuplicates(record) {
 }
 
 // ==========================================
-// SELECT OPTIONS
+// SELECT OPTIONS - FIXED
 // ==========================================
 
 function options(field, selectedValue = "") {
   if (!field.options) return "";
 
-  let vals = [];
+  const sourceMap = {
+    customers: ["Customers", "CustomerID", "CustomerName"],
+    vendors: ["Vendors", "VendorID", "VendorName"],
+    items: ["Items", "ItemID", "ItemName"],
+    banks: ["Banks", "BankID", "BankName"],
+    cash: ["CashAccounts", "CashAccountID", "CashAccountName"],
+    coa: ["ChartOfAccounts", "AccountID", "AccountName"]
+  };
 
-  if (field.options === "customers") vals = sheet("Customers");
-  else if (field.options === "vendors") vals = sheet("Vendors");
-  else if (field.options === "items") vals = sheet("Items");
-  else if (field.options === "banks") vals = sheet("Banks");
-  else if (field.options === "cash") vals = sheet("CashAccounts");
-  else if (field.options === "coa") vals = sheet("ChartOfAccounts");
+  const config = sourceMap[field.options];
 
-  return vals.map(x => {
-    const value = x[field.valueKey || "CustomerID"];
-    const label =
-      x[field.labelKey || "CustomerName"] ||
-      x.AccountName ||
-      x.ItemName ||
-      x.BankName ||
-      x.CashAccountName ||
-      value;
-    const selected = String(value) === String(selectedValue) ? "selected" : "";
-    return `<option value="${esc(value)}" ${selected}>${esc(label)}</option>`;
-  }).join("");
+  if (!config) {
+    console.warn("Unknown dropdown source:", field.options);
+    return "";
+  }
+
+  const [sheetName, defaultValueKey, defaultLabelKey] = config;
+  const vals = sheet(sheetName);
+
+  const valueKey = field.valueKey || defaultValueKey;
+  const labelKey = field.labelKey || defaultLabelKey;
+
+  return vals
+    .filter(x => x && x[valueKey] !== undefined && x[valueKey] !== null)
+    .map(x => {
+      const value = x[valueKey];
+      const label = x[labelKey] || value;
+      const selected =
+        String(value) === String(selectedValue) ? "selected" : "";
+
+      return `<option value="${esc(value)}" ${selected}>${esc(label)}</option>`;
+    })
+    .join("");
 }
+
+// ==========================================
+// INPUT GENERATOR
+// ==========================================
 
 function input(f, value = undefined, editMode = false) {
   const v = value !== undefined ? value : (f.value || "");
@@ -191,58 +207,125 @@ function ensureEditModal() {
   if ($("editModal")) return;
 
   const style = document.createElement("style");
+
   style.textContent = `
     .acc-modal-backdrop {
-      position: fixed; inset: 0; z-index: 9999;
-      display: none; align-items: center; justify-content: center;
-      padding: 20px; background: rgba(15, 23, 42, .48);
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: rgba(15, 23, 42, .48);
     }
+
     .acc-modal {
-      width: min(680px, 100%); max-height: 90vh; overflow: auto;
-      background: #fff; border-radius: 14px; padding: 22px;
+      width: min(680px, 100%);
+      max-height: 90vh;
+      overflow: auto;
+      background: #fff;
+      border-radius: 14px;
+      padding: 22px;
       box-shadow: 0 20px 60px rgba(0,0,0,.22);
     }
-    .acc-modal h3 { margin: 0 0 6px; color: #26364e; font-size: 19px; }
-    .acc-modal .acc-modal-desc { margin: 0 0 18px; color: #8993a5; font-size: 13px; }
+
+    .acc-modal h3 {
+      margin: 0 0 6px;
+      color: #26364e;
+      font-size: 19px;
+    }
+
+    .acc-modal .acc-modal-desc {
+      margin: 0 0 18px;
+      color: #8993a5;
+      font-size: 13px;
+    }
+
     .acc-modal .acc-modal-actions {
-      display: flex; justify-content: flex-end; gap: 9px; margin-top: 20px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 9px;
+      margin-top: 20px;
     }
-    .acc-modal .secondary { background: #eef2f8; color: #42516a; }
+
+    .acc-modal .secondary {
+      background: #eef2f8;
+      color: #42516a;
+    }
+
     .acc-modal .modal-error {
-      display: none; margin-top: 12px; padding: 10px;
-      border-radius: 7px; background: #fff0f0; color: #c03939; font-size: 12px;
+      display: none;
+      margin-top: 12px;
+      padding: 10px;
+      border-radius: 7px;
+      background: #fff0f0;
+      color: #c03939;
+      font-size: 12px;
     }
+
     @media (max-width: 560px) {
-      .acc-modal-backdrop { padding: 10px; }
-      .acc-modal { padding: 16px; }
-      .acc-modal .grid { grid-template-columns: 1fr; }
+      .acc-modal-backdrop {
+        padding: 10px;
+      }
+
+      .acc-modal {
+        padding: 16px;
+      }
+
+      .acc-modal .grid {
+        grid-template-columns: 1fr;
+      }
     }
   `;
+
   document.head.appendChild(style);
 
   const backdrop = document.createElement("div");
+
   backdrop.id = "editModal";
   backdrop.className = "acc-modal-backdrop";
+
   backdrop.innerHTML = `
-    <section class="acc-modal" role="dialog" aria-modal="true" aria-labelledby="editModalTitle">
+    <section class="acc-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="editModalTitle">
+
       <h3 id="editModalTitle">Edit Record</h3>
-      <p class="acc-modal-desc">Update the record details below.</p>
+
+      <p class="acc-modal-desc">
+        Update the record details below.
+      </p>
+
       <form id="editForm">
         <div class="grid" id="editFormFields"></div>
+
         <div id="editError" class="modal-error"></div>
+
         <div class="acc-modal-actions">
-          <button type="button" class="secondary" id="cancelEdit">Cancel</button>
-          <button type="submit" id="updateRecordButton">Save Changes</button>
+          <button type="button"
+            class="secondary"
+            id="cancelEdit">
+            Cancel
+          </button>
+
+          <button type="submit" id="updateRecordButton">
+            Save Changes
+          </button>
         </div>
       </form>
     </section>
   `;
+
   document.body.appendChild(backdrop);
 
   $("cancelEdit").addEventListener("click", closeEditModal);
+
   backdrop.addEventListener("click", e => {
     if (e.target === backdrop) closeEditModal();
   });
+
   $("editForm").addEventListener("submit", saveEditModal);
 }
 
@@ -250,15 +333,19 @@ let editingRecord = null;
 
 function closeEditModal() {
   const modal = $("editModal");
+
   if (modal) modal.style.display = "none";
+
   editingRecord = null;
 }
 
 function openEditModal(record) {
   editingRecord = record;
+
   ensureEditModal();
 
   $("editModalTitle").textContent = `Edit ${cfg.title}`;
+
   $("editFormFields").innerHTML = cfg.fields.map(f => `
     <label>
       ${esc(f.label)}
@@ -268,19 +355,27 @@ function openEditModal(record) {
 
   $("editError").style.display = "none";
   $("editError").textContent = "";
+
   $("updateRecordButton").disabled = false;
   $("editModal").style.display = "flex";
 }
 
+// ==========================================
+// SAVE EDIT
+// ==========================================
+
 async function saveEditModal(e) {
   e.preventDefault();
+
   if (!editingRecord) return;
 
   const button = $("updateRecordButton");
   const errorBox = $("editError");
 
   try {
-    if (!allowed("CanEdit")) throw new Error("No edit permission");
+    if (!allowed("CanEdit")) {
+      throw new Error("No edit permission");
+    }
 
     button.disabled = true;
     errorBox.style.display = "none";
@@ -290,12 +385,18 @@ async function saveEditModal(e) {
 
     cfg.fields.forEach(f => {
       changes[f.name] = fd.get(f.name);
-      if (f.type === "number") changes[f.name] = n(changes[f.name]);
+
+      if (f.type === "number") {
+        changes[f.name] = n(changes[f.name]);
+      }
     });
 
-    // Prevent duplicate unique values, excluding the record being edited.
+    // Duplicate validation during edit
     for (const field of (cfg.uniqueFields || [])) {
-      const value = String(changes[field] ?? "").trim().toLowerCase();
+      const value = String(changes[field] ?? "")
+        .trim()
+        .toLowerCase();
+
       if (!value) continue;
 
       const duplicate = data.some(row =>
@@ -305,7 +406,10 @@ async function saveEditModal(e) {
 
       if (duplicate) {
         const fieldConfig = cfg.fields.find(f => f.name === field);
-        throw new Error(`${fieldConfig?.label || field} already exists. Duplicate records are not allowed.`);
+
+        throw new Error(
+          `${fieldConfig?.label || field} already exists. Duplicate records are not allowed.`
+        );
       }
     }
 
@@ -319,13 +423,18 @@ async function saveEditModal(e) {
     await saveExcel();
 
     data = getSheet(cfg.sheet);
+
     render();
     closeEditModal();
+
     message("Record updated successfully.");
+
   } catch (err) {
     console.error("EDIT ERROR:", err);
+
     errorBox.textContent = err.message;
     errorBox.style.display = "block";
+
   } finally {
     button.disabled = false;
   }
@@ -355,13 +464,17 @@ function render() {
 
   $("tableBody").innerHTML = data.map((r, i) => `
     <tr>
-      ${cfg.columns.map(c => `<td>${esc(r[c.key])}</td>`).join("")}
+      ${cfg.columns.map(c =>
+        `<td>${esc(r[c.key])}</td>`
+      ).join("")}
+
       <td>
         ${
           allowed("CanEdit")
             ? `<button data-edit="${i}">Edit</button>`
             : ""
         }
+
         ${
           allowed("CanDelete")
             ? `<button class="danger" data-del="${i}">Deactivate</button>`
@@ -414,12 +527,13 @@ async function load() {
 
   } catch (e) {
     console.error("DATABASE LOAD ERROR:", e);
+
     message("Database error: " + e.message, true);
   }
 }
 
 // ==========================================
-// SAVE RECORD
+// SAVE NEW RECORD
 // ==========================================
 
 $("form").addEventListener("submit", async e => {
@@ -447,7 +561,7 @@ $("form").addEventListener("submit", async e => {
       }
     });
 
-    // CHECK DUPLICATE RECORDS BEFORE SAVING
+    // Check duplicate records
     checkDuplicates(rec);
 
     const t = now();
@@ -470,6 +584,7 @@ $("form").addEventListener("submit", async e => {
     }
 
     rec.CreatedAt = t;
+
     if (cfg.updatedAtField !== false) {
       rec.UpdatedAt = t;
     }
@@ -503,6 +618,7 @@ $("form").addEventListener("submit", async e => {
 
   } catch (err) {
     console.error("SAVE ERROR:", err);
+
     message(err.message, true);
 
   } finally {
@@ -546,14 +662,17 @@ $("tableBody").addEventListener("click", async e => {
 
     } catch (err) {
       console.error("DEACTIVATE ERROR:", err);
+
       message(err.message, true);
     }
   }
 
-  // EDIT: open a structured modal instead of browser prompt dialogs
+  // EDIT
   else if (edit !== undefined) {
     if (!allowed("CanEdit")) return;
+
     const r = data[Number(edit)];
+
     openEditModal(r);
   }
 });
