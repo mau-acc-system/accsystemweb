@@ -665,7 +665,13 @@ function logout() {
 }
 
 function toggleGroup(group) {
-    group.classList.toggle("open");
+    const element = typeof group === "string"
+        ? document.getElementById(group)
+        : group;
+
+    if (element) {
+        element.classList.toggle("open");
+    }
 }
 
 function setActive(element, title) {
