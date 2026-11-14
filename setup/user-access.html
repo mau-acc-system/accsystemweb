@@ -10,867 +10,582 @@
 
 <style>
 * {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: Arial, sans-serif;
+    box-sizing: border-box;
 }
 
 body {
-  background: #f4f6fa;
-  color: #263449;
+    margin: 0;
+    padding: 28px;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f4f6fa;
+    color: #26364e;
 }
 
-.app {
-  display: flex;
-  min-height: 100vh;
+.page-heading {
+    margin-bottom: 22px;
 }
 
-.sidebar {
-  width: 250px;
-  height: 100vh;
-  position: fixed;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  background: #172f50;
-  color: white;
-  padding: 25px 15px;
-  display: flex;
-  flex-direction: column;
-  flex-shrink: 0;
-  overflow-y: auto;
+.page-heading h2 {
+    font-size: 23px;
+    margin: 0 0 7px;
 }
 
-.brand {
-  font-size: 23px;
-  font-weight: bold;
-  padding: 0 12px 35px;
-}
-
-.menu-label {
-  color: #91a5bf;
-  font-size: 11px;
-  padding: 12px;
-  letter-spacing: 1px;
-}
-
-.nav-link {
-  display: flex;
-  gap: 12px;
-  padding: 13px 12px;
-  margin-bottom: 5px;
-  border-radius: 7px;
-  color: #c6d3e3;
-  text-decoration: none;
-  font-size: 14px;
-}
-
-.nav-link:hover,
-.nav-link.active {
-  background: #294b73;
-  color: white;
-}
-
-.sidebar-bottom {
-  margin-top: auto;
-  padding-top: 25px;
-}
-
-.logout {
-  width: 100%;
-  padding: 13px;
-  background: #294b73;
-  color: white;
-  border: none;
-  border-radius: 7px;
-  cursor: pointer;
-}
-
-.main {
-  flex: 1;
-  min-width: 0;
-  margin-left: 250px;
-}
-
-.topbar {
-  height: 75px;
-  background: white;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 30px;
-  border-bottom: 1px solid #e8ecf2;
-}
-
-.topbar h2 {
-  font-size: 18px;
-  color: #263c59;
-}
-
-.user-info {
-  font-size: 13px;
-  text-align: right;
-}
-
-.content {
-  padding: 30px;
-}
-
-.heading {
-  margin-bottom: 25px;
-}
-
-.heading h1 {
-  color: #172f50;
-  font-size: 25px;
-  margin-bottom: 8px;
-}
-
-.heading p {
-  color: #8490a0;
-  font-size: 14px;
+.page-heading p {
+    font-size: 13px;
+    color: #8993a5;
+    margin: 0;
 }
 
 .panel {
-  background: white;
-  border: 1px solid #e9edf3;
-  border-radius: 10px;
-  padding: 22px;
-  margin-bottom: 20px;
+    background: white;
+    border: 1px solid #e5eaf1;
+    border-radius: 9px;
+    padding: 24px;
+    margin-bottom: 20px;
 }
 
 .panel h3 {
-  font-size: 16px;
-  color: #263c59;
-  margin-bottom: 18px;
+    font-size: 17px;
+    margin: 0 0 20px;
+}
+
+.user-select {
+    max-width: 420px;
+}
+
+label {
+    display: block;
+    font-size: 12px;
+    font-weight: bold;
+    color: #58677d;
+    margin-bottom: 8px;
 }
 
 select {
-  width: 100%;
-  max-width: 420px;
-  padding: 13px;
-  border: 1px solid #dce2ea;
-  border-radius: 7px;
-  background: white;
-  outline: none;
-  font-size: 14px;
+    width: 100%;
+    height: 42px;
+    padding: 0 12px;
+    border: 1px solid #dce2eb;
+    border-radius: 6px;
+    background: white;
+    font-size: 13px;
+    outline: none;
+}
+
+select:focus {
+    border-color: #315efb;
 }
 
 .user-details {
-  margin-top: 15px;
-  font-size: 13px;
-  color: #778397;
-  line-height: 1.8;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+    margin-top: 18px;
+    padding: 15px;
+    background: #f7f9fc;
+    border-radius: 7px;
+    font-size: 12px;
+}
+
+.detail-label {
+    color: #8993a5;
+    margin-bottom: 5px;
+}
+
+.detail-value {
+    font-weight: bold;
+    color: #26364e;
 }
 
 .toolbar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-bottom: 18px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
 }
 
-button {
-  cursor: pointer;
+.toolbar button,
+.save-button {
+    border: 1px solid #dce2eb;
+    background: #f8f9fc;
+    color: #40516b;
+    padding: 10px 17px;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
 }
 
-.tool-btn {
-  border: 1px solid #dce2ea;
-  background: #f8fafc;
-  padding: 9px 14px;
-  border-radius: 6px;
-  color: #33445b;
-  font-size: 12px;
+.toolbar button:hover {
+    background: #edf2fa;
 }
 
-.tool-btn:hover {
-  background: #eaf0f7;
+.save-button {
+    background: #315efb;
+    color: white;
+    border-color: #315efb;
+    font-weight: bold;
+    padding: 12px 22px;
 }
 
-.table-wrap {
-  overflow-x: auto;
+.save-button:hover {
+    background: #244bd2;
+}
+
+button:disabled {
+    opacity: .6;
+    cursor: wait;
+}
+
+.table-wrapper {
+    width: 100%;
+    overflow-x: auto;
 }
 
 table {
-  width: 100%;
-  border-collapse: collapse;
-  min-width: 650px;
+    width: 100%;
+    min-width: 680px;
+    border-collapse: collapse;
+}
+
+thead {
+    background: #f3f5f9;
 }
 
 th {
-  background: #f4f6fa;
-  color: #66758a;
-  font-size: 12px;
-  text-align: center;
-  padding: 15px 10px;
-  border-bottom: 1px solid #e6ebf1;
+    padding: 15px;
+    text-align: center;
+    font-size: 12px;
+    color: #65748b;
 }
 
 th:first-child {
-  text-align: left;
+    text-align: left;
 }
 
 td {
-  padding: 15px 10px;
-  border-bottom: 1px solid #edf0f4;
-  text-align: center;
-  font-size: 13px;
+    padding: 17px 15px;
+    border-bottom: 1px solid #e9edf3;
+    text-align: center;
+    font-size: 13px;
 }
 
 td:first-child {
-  text-align: left;
-  font-weight: bold;
-  color: #33445b;
+    text-align: left;
+    font-weight: bold;
 }
 
 input[type="checkbox"] {
-  width: 17px;
-  height: 17px;
-  cursor: pointer;
-  accent-color: #1d5b96;
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: #315efb;
 }
 
-.module-name {
-  display: block;
+.status-message {
+    display: none;
+    padding: 12px 15px;
+    border-radius: 6px;
+    font-size: 12px;
+    margin-bottom: 18px;
 }
 
-.save-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 12px;
-}
-
-.save-btn {
-  border: none;
-  background: #183153;
-  color: white;
-  padding: 13px 22px;
-  border-radius: 7px;
-  font-weight: bold;
-}
-
-.save-btn:disabled {
-  opacity: .6;
-  cursor: not-allowed;
-}
-
-.status {
-  font-size: 13px;
-  color: #64748b;
-}
-
-.status.error {
-  color: #d32f2f;
-}
-
-.status.success {
-  color: #198754;
-}
-
-.empty {
-  color: #98a2b1;
-  text-align: center;
-  padding: 35px;
-  font-size: 13px;
-}
-
-@media(max-width: 850px) {
-  .sidebar {
-    width: 210px;
-  }
-}
-
-@media(max-width: 650px) {
-  .app {
+.status-message.success {
     display: block;
-  }
+    background: #e8f8ef;
+    color: #16834b;
+}
 
-  .sidebar {
-    width: 100%;
-    padding: 15px;
-  }
+.status-message.error {
+    display: block;
+    background: #fff0f0;
+    color: #c03939;
+}
 
-  .brand {
-    padding-bottom: 15px;
-  }
+.bottom-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 22px;
+}
 
-  .sidebar-bottom {
-    margin-top: 10px;
-  }
+.loading {
+    color: #8993a5;
+    font-size: 13px;
+    padding: 20px 0;
+}
 
-  .topbar {
-    padding: 0 15px;
-    height: 60px;
-  }
+@media(max-width: 600px) {
+    body {
+        padding: 16px;
+    }
 
-  .content {
-    padding: 18px 12px;
-  }
+    .panel {
+        padding: 17px;
+    }
 
-  .heading h1 {
-    font-size: 21px;
-  }
+    .user-details {
+        gap: 16px;
+    }
 }
 </style>
 </head>
 
 <body>
 
-<div class="app">
+<div class="page-heading">
+    <h2>User Access</h2>
+    <p>Manage module permissions for each system user.</p>
+</div>
 
-  <!-- SIDEBAR -->
+<div id="statusMessage" class="status-message"></div>
 
-  <aside class="sidebar">
+<div class="panel">
+    <h3>Select User</h3>
 
-    <div class="brand">ACC SYSTEM</div>
-
-    <div class="menu-label">MAIN MENU</div>
-
-    <a class="nav-link" href="../dashboard.html">
-      ▦ Dashboard
-    </a>
-
-    <div class="menu-label">MANAGEMENT</div>
-
-    <a class="nav-link active" href="user-access.html">
-      ♙ User Access
-    </a>
-
-    <div class="sidebar-bottom">
-      <button class="logout" id="logoutButton">
-        ↪ Sign Out
-      </button>
+    <div class="user-select">
+        <label for="userSelect">User Account</label>
+        <select id="userSelect" disabled>
+            <option value="">Loading users...</option>
+        </select>
     </div>
 
-  </aside>
-
-  <!-- MAIN -->
-
-  <main class="main">
-
-    <header class="topbar">
-      <h2>User Access Management</h2>
-
-      <div class="user-info">
-        <strong id="currentUser">Administrator</strong>
-        <div id="currentRole">Administrator</div>
-      </div>
-    </header>
-
-    <section class="content">
-
-      <div class="heading">
-        <h1>User Access</h1>
-        <p>Manage module permissions for each system user.</p>
-      </div>
-
-      <!-- USER SELECTION -->
-
-      <div class="panel">
-
-        <h3>Select User</h3>
-
-        <select id="userSelect">
-          <option value="">Loading users...</option>
-        </select>
-
-        <div class="user-details" id="userDetails">
-          Select a user to manage permissions.
+    <div class="user-details" id="userDetails" style="display:none;">
+        <div>
+            <div class="detail-label">Username</div>
+            <div class="detail-value" id="detailUsername">-</div>
         </div>
 
-      </div>
-
-      <!-- PERMISSIONS -->
-
-      <div class="panel">
-
-        <h3>Module Permissions</h3>
-
-        <div class="toolbar">
-
-          <button class="tool-btn" id="selectAll">
-            Select All
-          </button>
-
-          <button class="tool-btn" id="clearAll">
-            Clear All
-          </button>
-
-          <button class="tool-btn" id="viewOnly">
-            View Only
-          </button>
-
+        <div>
+            <div class="detail-label">Display Name</div>
+            <div class="detail-value" id="detailName">-</div>
         </div>
 
-        <div class="table-wrap">
+        <div>
+            <div class="detail-label">Role</div>
+            <div class="detail-value" id="detailRole">-</div>
+        </div>
 
-          <table>
+        <div>
+            <div class="detail-label">Status</div>
+            <div class="detail-value" id="detailStatus">-</div>
+        </div>
+    </div>
+</div>
 
+<div class="panel">
+    <h3>Module Permissions</h3>
+
+    <div class="toolbar">
+        <button type="button" id="selectAll">Select All</button>
+        <button type="button" id="clearAll">Clear All</button>
+        <button type="button" id="viewOnly">View Only</button>
+    </div>
+
+    <div class="table-wrapper">
+        <table>
             <thead>
-              <tr>
-                <th>Module</th>
-                <th>View</th>
-                <th>Create</th>
-                <th>Edit</th>
-                <th>Delete</th>
-                <th>Approve</th>
-              </tr>
+                <tr>
+                    <th>Module</th>
+                    <th>View</th>
+                    <th>Create</th>
+                    <th>Edit</th>
+                    <th>Delete</th>
+                    <th>Approve</th>
+                </tr>
             </thead>
 
-            <tbody id="permissionTable">
-
-              <tr>
-                <td colspan="6" class="empty">
-                  Select a user first.
-                </td>
-              </tr>
-
+            <tbody id="permissionBody">
+                <tr>
+                    <td colspan="6" class="loading">Loading permissions...</td>
+                </tr>
             </tbody>
+        </table>
+    </div>
 
-          </table>
-
-        </div>
-
-      </div>
-
-      <!-- SAVE -->
-
-      <div class="panel">
-
-        <div class="save-row">
-
-          <div class="status" id="statusMessage">
-            Ready.
-          </div>
-
-          <button class="save-btn" id="saveButton">
+    <div class="bottom-actions">
+        <button type="button" class="save-button" id="saveButton" disabled>
             Save Permissions
-          </button>
-
-        </div>
-
-      </div>
-
-    </section>
-
-  </main>
-
+        </button>
+    </div>
 </div>
 
 <script type="module">
-
 import {
-  validateLicense,
-  readExcel,
-  getSheet,
-  deleteRecord,
-  addRecord,
-  saveExcel
+    validateLicense,
+    readExcel,
+    getSheet,
+    deleteRecord,
+    addRecord,
+    saveExcel
 } from "../excel.js";
 
-// =====================================
-// SESSION
-// =====================================
+const session = JSON.parse(
+    sessionStorage.getItem("accsystem_session") || "null"
+);
 
-const sessionData = sessionStorage.getItem("accsystem_session");
-
-if (!sessionData) {
-  window.location.replace("../login.html");
+if (!session) {
+    window.top.location.href = "../login.html";
 }
 
-const session = JSON.parse(sessionData || "{}");
-
-if (session.Role !== "Administrator") {
-  alert("Administrator access required.");
-  window.location.replace("../dashboard.html");
+if (!session || session.Role !== "Administrator") {
+    document.body.innerHTML =
+        "<h2>Access Denied</h2><p>Administrator access is required.</p>";
+    throw new Error("Unauthorized access");
 }
 
-document.getElementById("currentUser").textContent =
-  session.DisplayName || session.Username || "Administrator";
-
-document.getElementById("currentRole").textContent =
-  session.Role || "";
-
-// =====================================
-// MODULE LIST
-// =====================================
-
-const MODULES = [
-  "Dashboard",
-  "Banks",
-  "Cash",
-  "Accounts Receivable",
-  "Accounts Payable",
-  "General Ledger",
-  "Inventory",
-  "Reports",
-  "Setup"
+const modules = [
+    "Dashboard",
+    "Banks",
+    "Cash",
+    "Accounts Receivable",
+    "Accounts Payable",
+    "General Ledger",
+    "Inventory",
+    "Reports",
+    "Setup"
 ];
 
-const userSelect = document.getElementById("userSelect");
-const permissionTable = document.getElementById("permissionTable");
-const userDetails = document.getElementById("userDetails");
-const statusMessage = document.getElementById("statusMessage");
-const saveButton = document.getElementById("saveButton");
+const permissionFields = [
+    "CanView",
+    "CanCreate",
+    "CanEdit",
+    "CanDelete",
+    "CanApprove"
+];
 
 let users = [];
-let accessRecords = [];
+let userAccess = [];
 let selectedUser = null;
 let databaseReady = false;
 
-// =====================================
-// STATUS
-// =====================================
+const userSelect = document.getElementById("userSelect");
+const permissionBody = document.getElementById("permissionBody");
+const saveButton = document.getElementById("saveButton");
+const statusMessage = document.getElementById("statusMessage");
 
-function setStatus(message, type = "") {
-  statusMessage.textContent = message;
-  statusMessage.className = "status " + type;
+function showMessage(message, type) {
+    statusMessage.textContent = message;
+    statusMessage.className = "status-message " + type;
 }
 
-// =====================================
-// LOAD DATABASE
-// =====================================
+function hideMessage() {
+    statusMessage.textContent = "";
+    statusMessage.className = "status-message";
+}
 
-async function initialize() {
+function isTrue(value) {
+    return value === true ||
+        String(value).toLowerCase() === "true" ||
+        String(value) === "1";
+}
 
-  try {
+function initializeTable() {
+    permissionBody.innerHTML = "";
 
-    setStatus("Connecting to database...");
+    modules.forEach(module => {
+        const row = document.createElement("tr");
+        const nameCell = document.createElement("td");
 
-    const license = await validateLicense();
+        nameCell.textContent = module;
+        row.appendChild(nameCell);
 
-    if (!license.valid) {
-      throw new Error(license.message);
+        permissionFields.forEach(field => {
+            const cell = document.createElement("td");
+            const checkbox = document.createElement("input");
+
+            checkbox.type = "checkbox";
+            checkbox.dataset.module = module;
+            checkbox.dataset.permission = field;
+
+            cell.appendChild(checkbox);
+            row.appendChild(cell);
+        });
+
+        permissionBody.appendChild(row);
+    });
+}
+
+function loadUserPermissions() {
+    hideMessage();
+
+    const userID = userSelect.value;
+    selectedUser = users.find(user => String(user.UserID) === userID);
+
+    if (!selectedUser) {
+        document.getElementById("userDetails").style.display = "none";
+        saveButton.disabled = true;
+        return;
     }
 
-    await readExcel();
-
-    users = getSheet("Users");
-    accessRecords = getSheet("UserAccess");
-
-    databaseReady = true;
-
-    populateUsers();
-
-    setStatus("Database connected.", "success");
-
-  } catch (error) {
-
-    setStatus(error.message, "error");
-
-  }
-
-}
-
-// =====================================
-// POPULATE USERS
-// =====================================
-
-function populateUsers() {
-
-  userSelect.innerHTML =
-    '<option value="">Select a user</option>';
-
-  users.forEach(user => {
-
-    const option = document.createElement("option");
-
-    option.value = user.UserID;
-
-    option.textContent =
-      `${user.DisplayName || user.Username} (${user.UserID})`;
-
-    userSelect.appendChild(option);
-
-  });
-
-}
-
-// =====================================
-// SELECT USER
-// =====================================
-
-userSelect.addEventListener("change", () => {
-
-  const userID = userSelect.value;
-
-  selectedUser = users.find(user =>
-    String(user.UserID) === String(userID)
-  );
-
-  if (!selectedUser) {
-
-    userDetails.textContent = "Select a user to manage permissions.";
-
-    permissionTable.innerHTML = `
-      <tr>
-        <td colspan="6" class="empty">Select a user first.</td>
-      </tr>
-    `;
-
-    return;
-  }
-
-  const active = String(selectedUser.IsActive).toLowerCase();
-
-  userDetails.innerHTML = `
-    User ID: ${escapeHTML(selectedUser.UserID)}<br>
-    Username: ${escapeHTML(selectedUser.Username)}<br>
-    Role: ${escapeHTML(selectedUser.Role)}<br>
-    Status: ${active === "true" || active === "1" ? "Active" : "Inactive"}
-  `;
-
-  renderPermissions();
-
-});
-
-// =====================================
-// HTML ESCAPE
-// =====================================
-
-function escapeHTML(value) {
-  return String(value ?? "").replace(/[&<>"']/g, char => ({
-    "&": "&amp;",
-    "<": "&lt;",
-    ">": "&gt;",
-    '"': "&quot;",
-    "'": "&#39;"
-  })[char]);
-}
-
-// =====================================
-// PERMISSION CHECKBOX
-// =====================================
-
-function isChecked(value) {
-
-  return ["true", "1", "yes"].includes(
-    String(value).toLowerCase()
-  );
-
-}
-
-// =====================================
-// RENDER PERMISSIONS
-// =====================================
-
-function renderPermissions() {
-
-  const existing = accessRecords.filter(row =>
-    String(row.UserID) === String(selectedUser.UserID)
-  );
-
-  permissionTable.innerHTML = "";
-
-  MODULES.forEach(module => {
-
-    const record = existing.find(row =>
-      String(row.Module).trim().toLowerCase() ===
-      module.toLowerCase()
-    ) || {};
-
-    const tr = document.createElement("tr");
-
-    tr.innerHTML = `
-      <td>
-        <span class="module-name">${escapeHTML(module)}</span>
-      </td>
-
-      ${["CanView","CanCreate","CanEdit","CanDelete","CanApprove"]
-        .map(field => `
-          <td>
-            <input
-              type="checkbox"
-              data-module="${escapeHTML(module)}"
-              data-field="${field}"
-              ${isChecked(record[field]) ? "checked" : ""}
-            >
-          </td>
-        `).join("")}
-    `;
-
-    permissionTable.appendChild(tr);
-
-  });
-
-}
-
-// =====================================
-// SELECT ALL
-// =====================================
-
-document.getElementById("selectAll").onclick = () => {
-
-  permissionTable
-    .querySelectorAll('input[type="checkbox"]')
-    .forEach(input => input.checked = true);
-
-};
-
-// =====================================
-// CLEAR ALL
-// =====================================
-
-document.getElementById("clearAll").onclick = () => {
-
-  permissionTable
-    .querySelectorAll('input[type="checkbox"]')
-    .forEach(input => input.checked = false);
-
-};
-
-// =====================================
-// VIEW ONLY
-// =====================================
-
-document.getElementById("viewOnly").onclick = () => {
-
-  permissionTable.querySelectorAll("tr").forEach(row => {
-
-    const checkboxes = row.querySelectorAll("input");
-
-    checkboxes.forEach((checkbox, index) => {
-      checkbox.checked = index === 0;
-    });
-
-  });
-
-};
-
-// =====================================
-// SAVE PERMISSIONS
-// =====================================
-
-saveButton.onclick = async () => {
-
-  if (!databaseReady) {
-    setStatus("Database is not connected.", "error");
-    return;
-  }
-
-  if (!selectedUser) {
-    setStatus("Please select a user first.", "error");
-    return;
-  }
-
-  if (!confirm(
-    `Save permissions for ${selectedUser.Username}?`
-  )) {
-    return;
-  }
-
-  saveButton.disabled = true;
-  saveButton.textContent = "Saving...";
-
-  try {
-
-    const newRecords = MODULES.map(module => {
-
-      const record = {
-        UserID: selectedUser.UserID,
-        Module: module,
-        Page: getPage(module),
-        CanView: false,
-        CanCreate: false,
-        CanEdit: false,
-        CanDelete: false,
-        CanApprove: false
-      };
-
-      const inputs = permissionTable.querySelectorAll(
-        `input[data-module="${CSS.escape(module)}"]`
-      );
-
-      inputs.forEach(input => {
-        record[input.dataset.field] = input.checked;
-      });
-
-      return record;
-
-    });
-
-    // Remove previous permissions for this user.
-    deleteRecord(
-      "UserAccess",
-      "UserID",
-      selectedUser.UserID
+    document.getElementById("userDetails").style.display = "flex";
+    document.getElementById("detailUsername").textContent =
+        selectedUser.Username || "-";
+    document.getElementById("detailName").textContent =
+        selectedUser.DisplayName || "-";
+    document.getElementById("detailRole").textContent =
+        selectedUser.Role || "-";
+    document.getElementById("detailStatus").textContent =
+        isTrue(selectedUser.IsActive) ? "Active" : "Inactive";
+
+    const records = userAccess.filter(
+        row => String(row.UserID) === String(selectedUser.UserID)
     );
 
-    // Insert updated permissions.
-    newRecords.forEach(record => {
-      addRecord("UserAccess", record);
+    permissionBody.querySelectorAll("input[type=checkbox]").forEach(box => {
+        const record = records.find(
+            row => row.Module === box.dataset.module
+        );
+
+        box.checked = record
+            ? isTrue(record[box.dataset.permission])
+            : false;
     });
-
-    // Save workbook to GitHub.
-    await saveExcel(
-      `Update user permissions: ${selectedUser.Username}`
-    );
-
-    // Update local records.
-    accessRecords = getSheet("UserAccess");
-
-    setStatus("Permissions saved successfully.", "success");
-
-  } catch (error) {
-
-    setStatus(error.message, "error");
-
-  } finally {
 
     saveButton.disabled = false;
-    saveButton.textContent = "Save Permissions";
-
-  }
-
-};
-
-// =====================================
-// PAGE MAPPING
-// =====================================
-
-function getPage(module) {
-
-  const pages = {
-    "Dashboard": "dashboard.html",
-    "Banks": "modules/banks.html",
-    "Cash": "modules/cash.html",
-    "Accounts Receivable": "modules/accounts-receivable.html",
-    "Accounts Payable": "modules/accounts-payable.html",
-    "General Ledger": "modules/general-ledger.html",
-    "Inventory": "modules/inventory.html",
-    "Reports": "reports/financial-reports.html",
-    "Setup": "setup/"
-  };
-
-  return pages[module] || "";
-
 }
 
-// =====================================
-// LOGOUT
-// =====================================
+function setAllPermissions(view, create, edit, remove, approve) {
+    permissionBody.querySelectorAll("input[type=checkbox]").forEach(box => {
+        const permission = box.dataset.permission;
 
-document.getElementById("logoutButton").onclick = () => {
+        const values = {
+            CanView: view,
+            CanCreate: create,
+            CanEdit: edit,
+            CanDelete: remove,
+            CanApprove: approve
+        };
 
-  if (confirm("Are you sure you want to sign out?")) {
+        box.checked = values[permission];
+    });
+}
 
-    sessionStorage.removeItem("accsystem_session");
+document.getElementById("selectAll").addEventListener("click", () => {
+    setAllPermissions(true, true, true, true, true);
+});
 
-    window.location.replace("../login.html");
+document.getElementById("clearAll").addEventListener("click", () => {
+    setAllPermissions(false, false, false, false, false);
+});
 
-  }
+document.getElementById("viewOnly").addEventListener("click", () => {
+    setAllPermissions(true, false, false, false, false);
+});
 
-};
+userSelect.addEventListener("change", loadUserPermissions);
 
-// =====================================
-// START
-// =====================================
+saveButton.addEventListener("click", async () => {
+    hideMessage();
+
+    if (!selectedUser || !databaseReady) {
+        showMessage("Please select a user first.", "error");
+        return;
+    }
+
+    saveButton.disabled = true;
+    saveButton.textContent = "Saving...";
+
+    try {
+        // Remove previous permissions for this user.
+        try {
+            deleteRecord(
+                "UserAccess",
+                "UserID",
+                selectedUser.UserID
+            );
+        } catch (error) {
+            // No previous permission rows is allowed.
+        }
+
+        // Save all module permission rows.
+        for (const module of modules) {
+            const record = {
+                UserID: selectedUser.UserID,
+                Module: module,
+                Page: module
+            };
+
+            permissionFields.forEach(field => {
+                const checkbox = permissionBody.querySelector(
+                    `input[data-module="${module}"][data-permission="${field}"]`
+                );
+
+                record[field] = checkbox ? checkbox.checked : false;
+            });
+
+            addRecord("UserAccess", record);
+        }
+
+        await saveExcel();
+
+        userAccess = (getSheet("UserAccess") || []);
+        showMessage(
+            "Permissions successfully saved for " +
+            selectedUser.Username + ".",
+            "success"
+        );
+
+    } catch (error) {
+        showMessage(
+            "Unable to save permissions: " + error.message,
+            "error"
+        );
+    } finally {
+        saveButton.disabled = false;
+        saveButton.textContent = "Save Permissions";
+    }
+});
+
+async function initialize() {
+    try {
+        const license = await validateLicense();
+
+        if (!license.valid) {
+            throw new Error(license.message || "License validation failed.");
+        }
+
+        await readExcel();
+
+        users = getSheet("Users") || [];
+        userAccess = getSheet("UserAccess") || [];
+
+        userSelect.innerHTML = '<option value="">Select a user</option>';
+
+        users.forEach(user => {
+            const option = document.createElement("option");
+            option.value = user.UserID;
+            option.textContent =
+                (user.DisplayName || user.Username) +
+                " (" + user.Username + ")";
+
+            userSelect.appendChild(option);
+        });
+
+        initializeTable();
+
+        userSelect.disabled = false;
+        databaseReady = true;
+
+        const administrator = users.find(
+            user => user.Role === "Administrator"
+        );
+
+        if (administrator) {
+            userSelect.value = administrator.UserID;
+            loadUserPermissions();
+        }
+
+    } catch (error) {
+        showMessage(
+            "Database connection failed: " + error.message,
+            "error"
+        );
+
+        permissionBody.innerHTML =
+            '<tr><td colspan="6">Unable to load permissions.</td></tr>';
+    }
+}
 
 initialize();
-
 </script>
 
 </body>
