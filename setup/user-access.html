@@ -1,0 +1,870 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>User Access | ACC System</title>
+
+<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  background: #f4f6fa;
+  color: #263449;
+}
+
+.app {
+  display: flex;
+  min-height: 100vh;
+}
+
+.sidebar {
+  width: 250px;
+  background: #172f50;
+  color: white;
+  padding: 25px 15px;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+
+.brand {
+  font-size: 23px;
+  font-weight: bold;
+  padding: 0 12px 35px;
+}
+
+.menu-label {
+  color: #91a5bf;
+  font-size: 11px;
+  padding: 12px;
+  letter-spacing: 1px;
+}
+
+.nav-link {
+  display: flex;
+  gap: 12px;
+  padding: 13px 12px;
+  margin-bottom: 5px;
+  border-radius: 7px;
+  color: #c6d3e3;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.nav-link:hover,
+.nav-link.active {
+  background: #294b73;
+  color: white;
+}
+
+.sidebar-bottom {
+  margin-top: auto;
+  padding-top: 25px;
+}
+
+.logout {
+  width: 100%;
+  padding: 13px;
+  background: #294b73;
+  color: white;
+  border: none;
+  border-radius: 7px;
+  cursor: pointer;
+}
+
+.main {
+  flex: 1;
+  min-width: 0;
+}
+
+.topbar {
+  height: 75px;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 30px;
+  border-bottom: 1px solid #e8ecf2;
+}
+
+.topbar h2 {
+  font-size: 18px;
+  color: #263c59;
+}
+
+.user-info {
+  font-size: 13px;
+  text-align: right;
+}
+
+.content {
+  padding: 30px;
+}
+
+.heading {
+  margin-bottom: 25px;
+}
+
+.heading h1 {
+  color: #172f50;
+  font-size: 25px;
+  margin-bottom: 8px;
+}
+
+.heading p {
+  color: #8490a0;
+  font-size: 14px;
+}
+
+.panel {
+  background: white;
+  border: 1px solid #e9edf3;
+  border-radius: 10px;
+  padding: 22px;
+  margin-bottom: 20px;
+}
+
+.panel h3 {
+  font-size: 16px;
+  color: #263c59;
+  margin-bottom: 18px;
+}
+
+select {
+  width: 100%;
+  max-width: 420px;
+  padding: 13px;
+  border: 1px solid #dce2ea;
+  border-radius: 7px;
+  background: white;
+  outline: none;
+  font-size: 14px;
+}
+
+.user-details {
+  margin-top: 15px;
+  font-size: 13px;
+  color: #778397;
+  line-height: 1.8;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+button {
+  cursor: pointer;
+}
+
+.tool-btn {
+  border: 1px solid #dce2ea;
+  background: #f8fafc;
+  padding: 9px 14px;
+  border-radius: 6px;
+  color: #33445b;
+  font-size: 12px;
+}
+
+.tool-btn:hover {
+  background: #eaf0f7;
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 650px;
+}
+
+th {
+  background: #f4f6fa;
+  color: #66758a;
+  font-size: 12px;
+  text-align: center;
+  padding: 15px 10px;
+  border-bottom: 1px solid #e6ebf1;
+}
+
+th:first-child {
+  text-align: left;
+}
+
+td {
+  padding: 15px 10px;
+  border-bottom: 1px solid #edf0f4;
+  text-align: center;
+  font-size: 13px;
+}
+
+td:first-child {
+  text-align: left;
+  font-weight: bold;
+  color: #33445b;
+}
+
+input[type="checkbox"] {
+  width: 17px;
+  height: 17px;
+  cursor: pointer;
+  accent-color: #1d5b96;
+}
+
+.module-name {
+  display: block;
+}
+
+.save-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.save-btn {
+  border: none;
+  background: #183153;
+  color: white;
+  padding: 13px 22px;
+  border-radius: 7px;
+  font-weight: bold;
+}
+
+.save-btn:disabled {
+  opacity: .6;
+  cursor: not-allowed;
+}
+
+.status {
+  font-size: 13px;
+  color: #64748b;
+}
+
+.status.error {
+  color: #d32f2f;
+}
+
+.status.success {
+  color: #198754;
+}
+
+.empty {
+  color: #98a2b1;
+  text-align: center;
+  padding: 35px;
+  font-size: 13px;
+}
+
+@media(max-width: 850px) {
+  .sidebar {
+    width: 210px;
+  }
+}
+
+@media(max-width: 650px) {
+  .app {
+    display: block;
+  }
+
+  .sidebar {
+    width: 100%;
+    padding: 15px;
+  }
+
+  .brand {
+    padding-bottom: 15px;
+  }
+
+  .sidebar-bottom {
+    margin-top: 10px;
+  }
+
+  .topbar {
+    padding: 0 15px;
+    height: 60px;
+  }
+
+  .content {
+    padding: 18px 12px;
+  }
+
+  .heading h1 {
+    font-size: 21px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <!-- SIDEBAR -->
+
+  <aside class="sidebar">
+
+    <div class="brand">ACC SYSTEM</div>
+
+    <div class="menu-label">MAIN MENU</div>
+
+    <a class="nav-link" href="../dashboard.html">
+      ▦ Dashboard
+    </a>
+
+    <div class="menu-label">MANAGEMENT</div>
+
+    <a class="nav-link active" href="user-access.html">
+      ♙ User Access
+    </a>
+
+    <div class="sidebar-bottom">
+      <button class="logout" id="logoutButton">
+        ↪ Sign Out
+      </button>
+    </div>
+
+  </aside>
+
+  <!-- MAIN -->
+
+  <main class="main">
+
+    <header class="topbar">
+      <h2>User Access Management</h2>
+
+      <div class="user-info">
+        <strong id="currentUser">Administrator</strong>
+        <div id="currentRole">Administrator</div>
+      </div>
+    </header>
+
+    <section class="content">
+
+      <div class="heading">
+        <h1>User Access</h1>
+        <p>Manage module permissions for each system user.</p>
+      </div>
+
+      <!-- USER SELECTION -->
+
+      <div class="panel">
+
+        <h3>Select User</h3>
+
+        <select id="userSelect">
+          <option value="">Loading users...</option>
+        </select>
+
+        <div class="user-details" id="userDetails">
+          Select a user to manage permissions.
+        </div>
+
+      </div>
+
+      <!-- PERMISSIONS -->
+
+      <div class="panel">
+
+        <h3>Module Permissions</h3>
+
+        <div class="toolbar">
+
+          <button class="tool-btn" id="selectAll">
+            Select All
+          </button>
+
+          <button class="tool-btn" id="clearAll">
+            Clear All
+          </button>
+
+          <button class="tool-btn" id="viewOnly">
+            View Only
+          </button>
+
+        </div>
+
+        <div class="table-wrap">
+
+          <table>
+
+            <thead>
+              <tr>
+                <th>Module</th>
+                <th>View</th>
+                <th>Create</th>
+                <th>Edit</th>
+                <th>Delete</th>
+                <th>Approve</th>
+              </tr>
+            </thead>
+
+            <tbody id="permissionTable">
+
+              <tr>
+                <td colspan="6" class="empty">
+                  Select a user first.
+                </td>
+              </tr>
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+      </div>
+
+      <!-- SAVE -->
+
+      <div class="panel">
+
+        <div class="save-row">
+
+          <div class="status" id="statusMessage">
+            Ready.
+          </div>
+
+          <button class="save-btn" id="saveButton">
+            Save Permissions
+          </button>
+
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+</div>
+
+<script type="module">
+
+import {
+  validateLicense,
+  readExcel,
+  getSheet,
+  deleteRecord,
+  addRecord,
+  saveExcel
+} from "../excel.js";
+
+// =====================================
+// SESSION
+// =====================================
+
+const sessionData = sessionStorage.getItem("accsystem_session");
+
+if (!sessionData) {
+  window.location.replace("../login.html");
+}
+
+const session = JSON.parse(sessionData || "{}");
+
+if (session.Role !== "Administrator") {
+  alert("Administrator access required.");
+  window.location.replace("../dashboard.html");
+}
+
+document.getElementById("currentUser").textContent =
+  session.DisplayName || session.Username || "Administrator";
+
+document.getElementById("currentRole").textContent =
+  session.Role || "";
+
+// =====================================
+// MODULE LIST
+// =====================================
+
+const MODULES = [
+  "Dashboard",
+  "Banks",
+  "Cash",
+  "Accounts Receivable",
+  "Accounts Payable",
+  "General Ledger",
+  "Inventory",
+  "Reports",
+  "Setup"
+];
+
+const userSelect = document.getElementById("userSelect");
+const permissionTable = document.getElementById("permissionTable");
+const userDetails = document.getElementById("userDetails");
+const statusMessage = document.getElementById("statusMessage");
+const saveButton = document.getElementById("saveButton");
+
+let users = [];
+let accessRecords = [];
+let selectedUser = null;
+let databaseReady = false;
+
+// =====================================
+// STATUS
+// =====================================
+
+function setStatus(message, type = "") {
+  statusMessage.textContent = message;
+  statusMessage.className = "status " + type;
+}
+
+// =====================================
+// LOAD DATABASE
+// =====================================
+
+async function initialize() {
+
+  try {
+
+    setStatus("Connecting to database...");
+
+    const license = await validateLicense();
+
+    if (!license.valid) {
+      throw new Error(license.message);
+    }
+
+    await readExcel();
+
+    users = getSheet("Users");
+    accessRecords = getSheet("UserAccess");
+
+    databaseReady = true;
+
+    populateUsers();
+
+    setStatus("Database connected.", "success");
+
+  } catch (error) {
+
+    setStatus(error.message, "error");
+
+  }
+
+}
+
+// =====================================
+// POPULATE USERS
+// =====================================
+
+function populateUsers() {
+
+  userSelect.innerHTML =
+    '<option value="">Select a user</option>';
+
+  users.forEach(user => {
+
+    const option = document.createElement("option");
+
+    option.value = user.UserID;
+
+    option.textContent =
+      `${user.DisplayName || user.Username} (${user.UserID})`;
+
+    userSelect.appendChild(option);
+
+  });
+
+}
+
+// =====================================
+// SELECT USER
+// =====================================
+
+userSelect.addEventListener("change", () => {
+
+  const userID = userSelect.value;
+
+  selectedUser = users.find(user =>
+    String(user.UserID) === String(userID)
+  );
+
+  if (!selectedUser) {
+
+    userDetails.textContent = "Select a user to manage permissions.";
+
+    permissionTable.innerHTML = `
+      <tr>
+        <td colspan="6" class="empty">Select a user first.</td>
+      </tr>
+    `;
+
+    return;
+  }
+
+  const active = String(selectedUser.IsActive).toLowerCase();
+
+  userDetails.innerHTML = `
+    User ID: ${escapeHTML(selectedUser.UserID)}<br>
+    Username: ${escapeHTML(selectedUser.Username)}<br>
+    Role: ${escapeHTML(selectedUser.Role)}<br>
+    Status: ${active === "true" || active === "1" ? "Active" : "Inactive"}
+  `;
+
+  renderPermissions();
+
+});
+
+// =====================================
+// HTML ESCAPE
+// =====================================
+
+function escapeHTML(value) {
+  return String(value ?? "").replace(/[&<>"']/g, char => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  })[char]);
+}
+
+// =====================================
+// PERMISSION CHECKBOX
+// =====================================
+
+function isChecked(value) {
+
+  return ["true", "1", "yes"].includes(
+    String(value).toLowerCase()
+  );
+
+}
+
+// =====================================
+// RENDER PERMISSIONS
+// =====================================
+
+function renderPermissions() {
+
+  const existing = accessRecords.filter(row =>
+    String(row.UserID) === String(selectedUser.UserID)
+  );
+
+  permissionTable.innerHTML = "";
+
+  MODULES.forEach(module => {
+
+    const record = existing.find(row =>
+      String(row.Module).trim().toLowerCase() ===
+      module.toLowerCase()
+    ) || {};
+
+    const tr = document.createElement("tr");
+
+    tr.innerHTML = `
+      <td>
+        <span class="module-name">${escapeHTML(module)}</span>
+      </td>
+
+      ${["CanView","CanCreate","CanEdit","CanDelete","CanApprove"]
+        .map(field => `
+          <td>
+            <input
+              type="checkbox"
+              data-module="${escapeHTML(module)}"
+              data-field="${field}"
+              ${isChecked(record[field]) ? "checked" : ""}
+            >
+          </td>
+        `).join("")}
+    `;
+
+    permissionTable.appendChild(tr);
+
+  });
+
+}
+
+// =====================================
+// SELECT ALL
+// =====================================
+
+document.getElementById("selectAll").onclick = () => {
+
+  permissionTable
+    .querySelectorAll('input[type="checkbox"]')
+    .forEach(input => input.checked = true);
+
+};
+
+// =====================================
+// CLEAR ALL
+// =====================================
+
+document.getElementById("clearAll").onclick = () => {
+
+  permissionTable
+    .querySelectorAll('input[type="checkbox"]')
+    .forEach(input => input.checked = false);
+
+};
+
+// =====================================
+// VIEW ONLY
+// =====================================
+
+document.getElementById("viewOnly").onclick = () => {
+
+  permissionTable.querySelectorAll("tr").forEach(row => {
+
+    const checkboxes = row.querySelectorAll("input");
+
+    checkboxes.forEach((checkbox, index) => {
+      checkbox.checked = index === 0;
+    });
+
+  });
+
+};
+
+// =====================================
+// SAVE PERMISSIONS
+// =====================================
+
+saveButton.onclick = async () => {
+
+  if (!databaseReady) {
+    setStatus("Database is not connected.", "error");
+    return;
+  }
+
+  if (!selectedUser) {
+    setStatus("Please select a user first.", "error");
+    return;
+  }
+
+  if (!confirm(
+    `Save permissions for ${selectedUser.Username}?`
+  )) {
+    return;
+  }
+
+  saveButton.disabled = true;
+  saveButton.textContent = "Saving...";
+
+  try {
+
+    const newRecords = MODULES.map(module => {
+
+      const record = {
+        UserID: selectedUser.UserID,
+        Module: module,
+        Page: getPage(module),
+        CanView: false,
+        CanCreate: false,
+        CanEdit: false,
+        CanDelete: false,
+        CanApprove: false
+      };
+
+      const inputs = permissionTable.querySelectorAll(
+        `input[data-module="${CSS.escape(module)}"]`
+      );
+
+      inputs.forEach(input => {
+        record[input.dataset.field] = input.checked;
+      });
+
+      return record;
+
+    });
+
+    // Remove previous permissions for this user.
+    deleteRecord(
+      "UserAccess",
+      "UserID",
+      selectedUser.UserID
+    );
+
+    // Insert updated permissions.
+    newRecords.forEach(record => {
+      addRecord("UserAccess", record);
+    });
+
+    // Save workbook to GitHub.
+    await saveExcel(
+      `Update user permissions: ${selectedUser.Username}`
+    );
+
+    // Update local records.
+    accessRecords = getSheet("UserAccess");
+
+    setStatus("Permissions saved successfully.", "success");
+
+  } catch (error) {
+
+    setStatus(error.message, "error");
+
+  } finally {
+
+    saveButton.disabled = false;
+    saveButton.textContent = "Save Permissions";
+
+  }
+
+};
+
+// =====================================
+// PAGE MAPPING
+// =====================================
+
+function getPage(module) {
+
+  const pages = {
+    "Dashboard": "dashboard.html",
+    "Banks": "modules/banks.html",
+    "Cash": "modules/cash.html",
+    "Accounts Receivable": "modules/accounts-receivable.html",
+    "Accounts Payable": "modules/accounts-payable.html",
+    "General Ledger": "modules/general-ledger.html",
+    "Inventory": "modules/inventory.html",
+    "Reports": "reports/financial-reports.html",
+    "Setup": "setup/"
+  };
+
+  return pages[module] || "";
+
+}
+
+// =====================================
+// LOGOUT
+// =====================================
+
+document.getElementById("logoutButton").onclick = () => {
+
+  if (confirm("Are you sure you want to sign out?")) {
+
+    sessionStorage.removeItem("accsystem_session");
+
+    window.location.replace("../login.html");
+
+  }
+
+};
+
+// =====================================
+// START
+// =====================================
+
+initialize();
+
+</script>
+
+</body>
+</html>
