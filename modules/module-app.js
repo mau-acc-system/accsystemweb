@@ -141,6 +141,8 @@ function options(field, selectedValue = "") {
     items: ["Items", "ItemID", "ItemName"],
     banks: ["Banks", "BankID", "BankName"],
     cash: ["CashAccounts", "CashAccountID", "CashAccountName"],
+    invoices: ["Invoices", "InvoiceID", "InvoiceNo"],
+    bills: ["Bills", "BillID", "BillNo"],
     coa: ["ChartOfAccounts", "AccountID", "AccountName"]
   };
 
@@ -601,6 +603,13 @@ $("form").addEventListener("submit", async e => {
     console.log("SAVE: Record prepared:", rec);
 
     addRecord(cfg.sheet, rec);
+
+    // Post connected accounting effects for source transactions.
+    const accountingSheets = ["Invoices", "Bills", "InvoiceLines", "BillLines", "CustomerPayments", "VendorPayments"];
+    if (accountingSheets.includes(cfg.sheet)) {
+      const { postAccountingTransaction } = await import("./accounting-engine.js");
+      await postAccountingTransaction(cfg.sheet, rec);
+    }
 
     if (cfg.afterSave) {
       await cfg.afterSave(rec);
